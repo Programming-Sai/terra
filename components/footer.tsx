@@ -2,6 +2,29 @@ import React from "react";
 import Icon from "./icon";
 import Link from "next/link";
 
+const socialLinks = [
+  {
+    label: "Facebook",
+    href: "https://facebook.com",
+    icon: "facebook",
+  },
+  {
+    label: "Instagram",
+    href: "https://instagram.com",
+    icon: "photo_camera",
+  },
+  {
+    label: "WhatsApp",
+    href: "https://wa.me/233241234567",
+    icon: "chat",
+  },
+  {
+    label: "X",
+    href: "https://x.com",
+    icon: "public",
+  },
+] as const;
+
 export const Footer = () => {
   return (
     <footer className="w-full relative bg-charred-wood text-white">
@@ -14,20 +37,9 @@ export const Footer = () => {
             Quality accommodation in Accra. Experience true comfort and
             hospitality during your stay in Ghana.
           </p>
-          <div className="flex gap-4">
-            <a
-              className="bg-white/10 p-2 rounded-sm hover:bg-primary transition-colors"
-              href="#"
-            >
-              <Icon name="facebook" className="text-white" />
-            </a>
-            <a
-              className="bg-white/10 p-2 rounded-sm hover:bg-primary transition-colors"
-              href="#"
-            >
-              <Icon name="photo_camera" className="text-white" />
-            </a>
-          </div>
+          <p className="text-xs text-baked-silt/70 font-body-md leading-relaxed">
+            Find us on social channels below for updates and direct contact.
+          </p>
         </div>
         <div className="flex flex-col gap-4">
           <span className="font-label-caps text-xs text-dry-grass/60 uppercase font-bold tracking-widest mb-2">
@@ -73,25 +85,27 @@ export const Footer = () => {
             +233 24 123 4567
           </p>
         </div>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           <span className="font-label-caps text-xs text-dry-grass/60 uppercase font-bold tracking-widest mb-2">
-            Newsletter
+            Socials
           </span>
-          <p className="text-xs text-baked-silt font-body-md">
-            Get updates on special offers and room availability.
+          <p className="text-xs text-baked-silt font-body-md leading-relaxed">
+            Follow Terra Lodge for updates, travel inspiration, and direct
+            contact options.
           </p>
-          <div className="flex">
-            <input
-              className="w-full bg-white/5 border border-white/20 px-4 py-2 text-white focus:border-primary focus:ring-0 placeholder:text-baked-silt/40 text-sm"
-              placeholder="Email Address"
-              type="email"
-            />
-            <button
-              className="bg-primary px-4 hover:bg-laterite-red transition-all"
-              type="button"
-            >
-              <Icon name="send" />
-            </button>
+          <div className="grid grid-cols-2 gap-3">
+            {socialLinks.map((social) => (
+              <a
+                className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-3 hover:bg-white/10 transition-colors"
+                href={social.href}
+                key={social.label}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <Icon name={social.icon} className="text-white text-[20px]" />
+                <span className="text-sm font-body-md">{social.label}</span>
+              </a>
+            ))}
           </div>
         </div>
       </div>

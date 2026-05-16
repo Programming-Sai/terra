@@ -60,9 +60,17 @@ function SectionHeading({
   );
 }
 
-function ValueCard({ value }: { value: Value }) {
+function ValueCard({
+  value,
+  className = "",
+}: {
+  value: Value;
+  className?: string;
+}) {
   return (
-    <article className="bg-white border border-surface-container shadow-sm p-6 flex gap-4 items-start">
+    <article
+      className={`bg-white border border-surface-container shadow-sm p-6 flex gap-4 items-start h-full ${className}`.trim()}
+    >
       <div className="bg-primary-fixed text-primary p-3">
         <Icon name={value.icon} className="text-2xl" />
       </div>
@@ -179,9 +187,13 @@ export default function AboutPage() {
                 every guest at Terra Lodge.
               </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              {values.map((value) => (
-                <ValueCard key={value.title} value={value} />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {values.map((value, index) => (
+                <ValueCard
+                  className={index === values.length - 1 ? "md:col-span-2 lg:col-span-1" : ""}
+                  key={value.title}
+                  value={value}
+                />
               ))}
             </div>
           </div>
