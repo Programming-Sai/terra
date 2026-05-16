@@ -1,9 +1,10 @@
 "use client";
 
-import { type ChangeEvent, type ReactNode, useState } from "react";
+import { type ChangeEvent, type ReactNode, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import PaystackPop from "@paystack/inline-js";
 import Icon from "@/components/icon";
 import type { Room } from "@/lib/rooms";
 import { siteContent } from "@/lib/site-content";
@@ -16,8 +17,61 @@ type GuestInfo = {
   phone: string;
 };
 
+type BookingDetails = {
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  rooms: number;
+};
+
+type InitializeResponse = {
+  accessCode: string;
+  reference: string;
+  bookingId: string;
+  bookingCode: string;
+};
+
+type VerifyResponse = {
+  booking: {
+    paystack_reference: string | null;
+  };
+};
+
 function isModalType(value: string | null): value is Exclude<ModalType, null> {
   return value === "success" || value === "failed" || value === "cancelled";
+}
+
+function parseDate(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function calculateNights(checkIn: string, checkOut: string) {
+  const start = parseDate(checkIn);
+  const end = parseDate(checkOut);
+
+  if (!start || !end) return 1;
+
+  const diff = Math.ceil(
+    (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  return Math.max(diff, 1);
+}
+
+function formatDate(value: string) {
+  const date = parseDate(value);
+
+  if (!date) {
+    return "Not selected";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
 }
 
 function ModalShell({
@@ -209,46 +263,43 @@ function CancelledModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export default function CheckoutView({ room }: { room: Room }) {
+export default function CheckoutView({
+  room,
+  initialBooking,
+}: {
+  room: Room;
+  initialBooking: BookingDetails;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const modalFromUrl = searchParams.get("payment-status");
-  const initialSelectedModalType: Exclude<ModalType, null> = isModalType(
-    modalFromUrl,
-  )
-    ? modalFromUrl
-    : "success";
   const [guestInfo, setGuestInfo] = useState<GuestInfo>({
     fullName: "",
     email: "",
     phone: "",
   });
-  const [selectedModalType, setSelectedModalType] = useState<
-    Exclude<ModalType, null>
-  >(initialSelectedModalType);
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingBookingId, setPendingBookingId] = useState<string>("");
+  const [completedReference, setCompletedReference] = useState<string>("");
 
-  const isDevelopment = process.env.NODE_ENV !== "production";
   const activeModal = isModalType(modalFromUrl) ? modalFromUrl : null;
-  const booking = {
-    checkIn: {
-      date: "Tuesday, November 20, 2024",
-      time: "2:00 PM",
-    },
-    checkOut: {
-      date: "Sunday, November 25, 2024",
-      time: "11:00 AM",
-    },
-    nights: 5,
-    guests: {
-      adults: 2,
-      children: 0,
-    },
-    rooms: 1,
-  };
-  const subtotal = room.priceValue * booking.nights * booking.rooms;
-  const referenceCode = `TSL-${String(room.id).padStart(3, "0")}-ABC123`;
+  const booking = useMemo<BookingDetails>(
+    () => ({
+      checkIn: initialBooking.checkIn,
+      checkOut: initialBooking.checkOut,
+      guests: initialBooking.guests,
+      rooms: initialBooking.rooms,
+    }),
+    [initialBooking],
+  );
+
+  const nights = useMemo(
+    () => calculateNights(booking.checkIn, booking.checkOut),
+    [booking.checkIn, booking.checkOut],
+  );
+  const subtotal = room.priceValue * nights * booking.rooms;
+  const bookingReference = completedReference || "";
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target;
@@ -274,13 +325,100 @@ export default function CheckoutView({ room }: { room: Room }) {
     router.replace(nextUrl, { scroll: false });
   };
 
-  const handlePay = () => {
+  const markBookingFailed = async () => {
+    if (!pendingBookingId) {
+      return;
+    }
+
+    try {
+      await fetch(`/api/bookings/${pendingBookingId}`, {
+        body: JSON.stringify({
+          booking_status: "cancelled",
+          payment_status: "failed",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PATCH",
+      });
+    } catch {
+      // Ignore cleanup errors so the payment UI can still close cleanly.
+    }
+  };
+
+  const handlePay = async () => {
     setIsLoading(true);
 
-    window.setTimeout(() => {
+    try {
+      const initializeResponse = await fetch("/api/paystack/initialize", {
+        body: JSON.stringify({
+          roomId: room.id,
+          roomSlug: room.slug,
+          roomName: room.name,
+          guestName: guestInfo.fullName,
+          guestEmail: guestInfo.email,
+          guestPhone: guestInfo.phone,
+          checkInDate: booking.checkIn,
+          checkOutDate: booking.checkOut,
+          guestCount: booking.guests,
+          roomCount: booking.rooms,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+
+      if (!initializeResponse.ok) {
+        throw new Error("Failed to initialize payment.");
+      }
+
+      const initializeData =
+        (await initializeResponse.json()) as InitializeResponse;
+      setPendingBookingId(initializeData.bookingId);
+      setCompletedReference(initializeData.reference);
+
+      const paystack = new PaystackPop();
+
+      paystack.resumeTransaction(initializeData.accessCode, {
+        onCancel: () => {
+          setIsLoading(false);
+          void markBookingFailed();
+          setModalInUrl("cancelled");
+        },
+        onError: () => {
+          setIsLoading(false);
+          void markBookingFailed();
+          setModalInUrl("failed");
+        },
+        onLoad: () => {
+          setIsLoading(false);
+        },
+        onSuccess: async ({ reference }) => {
+          try {
+            const verifyResponse = await fetch(
+              `/api/paystack/verify?reference=${encodeURIComponent(reference)}`,
+            );
+
+            if (!verifyResponse.ok) {
+              throw new Error("Payment verification failed.");
+            }
+
+            const verifyData = (await verifyResponse.json()) as VerifyResponse;
+            setCompletedReference(verifyData.booking.paystack_reference ?? reference);
+            setModalInUrl("success");
+          } catch {
+            void markBookingFailed();
+            setModalInUrl("failed");
+          } finally {
+            setIsLoading(false);
+          }
+        },
+      });
+    } catch {
       setIsLoading(false);
-      setModalInUrl(selectedModalType);
-    }, 2000);
+      setModalInUrl("failed");
+    }
   };
 
   return (
@@ -347,13 +485,11 @@ export default function CheckoutView({ room }: { room: Room }) {
                       Check-in
                     </p>
                     <p className="font-body-md text-sm text-outline-clay mt-1">
-                      {booking.checkIn.date}
+                      {formatDate(booking.checkIn)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-body-md text-sm text-charred-wood">
-                      {booking.checkIn.time}
-                    </p>
+                    <p className="font-body-md text-sm text-charred-wood">2:00 PM</p>
                   </div>
                 </div>
 
@@ -363,13 +499,11 @@ export default function CheckoutView({ room }: { room: Room }) {
                       Check-out
                     </p>
                     <p className="font-body-md text-sm text-outline-clay mt-1">
-                      {booking.checkOut.date}
+                      {formatDate(booking.checkOut)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-body-md text-sm text-charred-wood">
-                      {booking.checkOut.time}
-                    </p>
+                    <p className="font-body-md text-sm text-charred-wood">11:00 AM</p>
                   </div>
                 </div>
 
@@ -378,7 +512,7 @@ export default function CheckoutView({ room }: { room: Room }) {
                     Duration
                   </p>
                   <p className="font-body-md text-sm text-on-surface-variant">
-                    {booking.nights} nights
+                    {nights} nights
                   </p>
                 </div>
 
@@ -387,7 +521,7 @@ export default function CheckoutView({ room }: { room: Room }) {
                     Guests
                   </p>
                   <p className="font-body-md text-sm text-on-surface-variant">
-                    {booking.guests.adults} Adults
+                    {booking.guests} guest{booking.guests > 1 ? "s" : ""}
                   </p>
                 </div>
 
@@ -396,7 +530,7 @@ export default function CheckoutView({ room }: { room: Room }) {
                     Rooms
                   </p>
                   <p className="font-body-md text-sm text-on-surface-variant">
-                    {booking.rooms} room
+                    {booking.rooms} room{booking.rooms > 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
@@ -409,8 +543,7 @@ export default function CheckoutView({ room }: { room: Room }) {
               <div className="flex flex-col gap-4 mt-6">
                 <div className="flex items-center justify-between pb-4 border-b border-surface-container">
                   <p className="font-body-md text-sm text-on-surface-variant">
-                    GHS {room.priceValue} x {booking.nights} nights x{" "}
-                    {booking.rooms} room
+                    GHS {room.priceValue} x {nights} nights x {booking.rooms} room
                   </p>
                   <p className="font-body-md text-sm text-charred-wood">
                     GHS {subtotal.toLocaleString()}
@@ -500,36 +633,6 @@ export default function CheckoutView({ room }: { room: Room }) {
                   </button>
                 </form>
 
-                {isDevelopment ? (
-                  <div className="mt-6 pt-6 border-t border-surface-container">
-                    <span className="font-label-caps text-xs font-bold text-outline-clay uppercase tracking-widest">
-                      Test Payment Outcome
-                    </span>
-                    <div className="mt-4 space-y-3">
-                      {(["success", "failed", "cancelled"] as const).map(
-                        (value) => (
-                          <label
-                            className="flex items-center gap-3 cursor-pointer"
-                            key={value}
-                          >
-                            <input
-                              checked={selectedModalType === value}
-                              className="w-4 h-4 accent-primary"
-                              onChange={() => setSelectedModalType(value)}
-                              name="test-payment-outcome"
-                              type="radio"
-                              value={value}
-                            />
-                            <span className="font-body-md text-sm capitalize text-charred-wood">
-                              {value}
-                            </span>
-                          </label>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                ) : null}
-
                 <div className="mt-6 text-center">
                   <p className="font-body-md text-xs text-outline-clay leading-relaxed">
                     Secure payment. You won&apos;t be charged yet.
@@ -551,7 +654,7 @@ export default function CheckoutView({ room }: { room: Room }) {
       {activeModal === "success" ? (
         <SuccessModal
           onClose={() => setModalInUrl(null)}
-          reference={referenceCode}
+          reference={bookingReference}
           roomId={room.id}
         />
       ) : null}

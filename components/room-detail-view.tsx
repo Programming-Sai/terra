@@ -37,6 +37,16 @@ export default function RoomDetailView({ room }: { room: Room }) {
   );
   const totalPrice = room.priceValue * nights * rooms;
   const gallery = room.gallery.length > 0 ? room.gallery : [room.image];
+  const bookNowHref = useMemo(() => {
+    const params = new URLSearchParams({
+      checkIn,
+      checkOut,
+      guests: String(guests),
+      rooms: String(rooms),
+    });
+
+    return `/checkout/${room.id}?${params.toString()}`;
+  }, [checkIn, checkOut, guests, room.id, rooms]);
 
   return (
     <main className="bg-[#fafaf9] text-charred-wood">
@@ -241,7 +251,7 @@ export default function RoomDetailView({ room }: { room: Room }) {
 
                 <Link
                   className="w-full mt-6 inline-flex items-center justify-center bg-primary text-white px-6 py-4 font-label-caps text-sm font-bold uppercase hover:bg-laterite-red transition-colors"
-                  href={`/checkout/${room.id}`}
+                  href={bookNowHref}
                 >
                   Book Now
                 </Link>
