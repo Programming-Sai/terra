@@ -43,7 +43,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       </button>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-[60] w-[280px] overflow-hidden border-r border-surface-container bg-white shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.08)] transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-[60] w-[min(280px,85vw)] overflow-hidden border-r border-surface-container bg-white shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.08)] transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -122,8 +122,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
         />
       ) : null}
 
-      <main className="lg:ml-[280px]">
-        <div className="mx-auto max-w-[1600px] px-6 py-6 sm:px-8 lg:px-10 lg:py-8">
+      <main className="overflow-x-hidden lg:ml-[280px]">
+        <div className="mx-auto max-w-[1600px] px-4 pb-8 pt-20 sm:px-6 sm:pt-16 lg:px-10 lg:py-8">
           {children}
         </div>
       </main>

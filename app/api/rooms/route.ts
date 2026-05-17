@@ -4,6 +4,10 @@ import { serializeRoom } from "@/lib/db-serializers";
 import { requireAdminSession } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
+const MAX_ROOM_IMAGES = Math.max(
+  1,
+  Number(process.env.NEXT_PUBLIC_MAX_ROOM_IMAGES ?? "6") || 6,
+);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -77,6 +81,10 @@ export async function POST(request: Request) {
       : [],
     featured: typeof body.featured === "boolean" ? body.featured : false,
   };
+
+  if (values.images.length > MAX_ROOM_IMAGES) {
+    return badRequest(`A room can only have up to ${MAX_ROOM_IMAGES} images.`);
+  }
 
   const result = await query(
     `insert into rooms (

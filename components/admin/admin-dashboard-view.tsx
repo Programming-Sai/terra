@@ -141,9 +141,9 @@ function Panel({
   className?: string;
 }) {
   return (
-    <section className={`border border-surface-container bg-white p-6 ${className}`}>
-      <div className="mb-6 flex flex-col">
-        <h2 className="font-eczar text-[24px] font-bold text-charred-wood">
+    <section className={`overflow-hidden border border-surface-container bg-white p-4 sm:p-6 ${className}`}>
+      <div className="mb-5 flex flex-col sm:mb-6">
+        <h2 className="font-eczar text-[20px] font-bold text-charred-wood sm:text-[24px]">
           {title}
         </h2>
       </div>
@@ -155,7 +155,7 @@ function Panel({
 function StatCard({ stat }: { stat: Stat }) {
   return (
     <div className="border border-surface-container bg-white p-6 shadow-sm">
-      <div className="mb-4 flex items-start justify-between">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <div
           className={`flex h-12 w-12 items-center justify-center rounded-sm ${stat.tone}`}
         >
@@ -194,26 +194,26 @@ function BarChart({
 
   return (
     <Panel title={title}>
-      <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-outline-clay">
+      <div className="mb-4 flex flex-col gap-1 text-xs font-bold uppercase tracking-widest text-outline-clay sm:flex-row sm:items-center sm:justify-between">
         <span>{valueLabel}</span>
         <span>{Math.max(...data.map((item) => item.value)).toLocaleString()}</span>
       </div>
-      <div className="flex h-[280px] items-end gap-4 border-b border-l border-surface-container pb-4 pl-4">
+      <div className="flex h-[220px] items-end gap-2 overflow-x-hidden border-b border-l border-surface-container pb-3 pl-2 sm:h-[280px] sm:gap-4 sm:pb-4 sm:pl-4">
         {data.map((item) => {
           const height = Math.max((item.value / max) * 100, 8);
 
           return (
             <div
-              className="flex flex-1 flex-col items-center justify-end gap-3"
+              className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2 sm:gap-3"
               key={item.label}
             >
-              <div className="flex h-[220px] w-full items-end justify-center">
+              <div className="flex h-[170px] w-full items-end justify-center sm:h-[220px]">
                 <div
-                  className="w-full max-w-[42px] rounded-t-sm bg-primary shadow-[0_12px_24px_rgba(74,30,0,0.15)]"
+                  className="w-full max-w-[28px] rounded-t-sm bg-primary shadow-[0_12px_24px_rgba(74,30,0,0.15)] sm:max-w-[42px]"
                   style={{ height: `${height}%` }}
                 />
               </div>
-              <span className="font-body-md text-[12px] text-outline-clay">
+              <span className="text-center font-body-md text-[10px] text-outline-clay sm:text-[12px]">
                 {item.label}
               </span>
             </div>
@@ -245,17 +245,17 @@ function DonutChart({
 
   return (
     <Panel title={title}>
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-5 sm:gap-6">
         <div
-          className="relative h-56 w-56 rounded-full"
+          className="relative h-44 w-44 rounded-full sm:h-56 sm:w-56"
           style={{
             background: `conic-gradient(${gradient})`,
           }}
         >
-          <div className="absolute inset-8 rounded-full bg-white shadow-inner" />
+          <div className="absolute inset-6 rounded-full bg-white shadow-inner sm:inset-8" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <div className="font-eczar text-3xl font-bold text-charred-wood">
+              <div className="font-eczar text-2xl font-bold text-charred-wood sm:text-3xl">
                 {total}
               </div>
               <div className="font-label-caps text-[10px] font-bold uppercase tracking-widest text-outline-clay">
@@ -264,14 +264,14 @@ function DonutChart({
             </div>
           </div>
         </div>
-        <div className="grid w-full gap-3 sm:grid-cols-2">
+        <div className="grid w-full gap-2 sm:grid-cols-2 sm:gap-3">
           {slices.map((slice) => (
-            <div className="flex items-center gap-3" key={slice.name}>
+            <div className="flex items-center gap-2 sm:gap-3" key={slice.name}>
               <span
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: slice.color }}
               />
-              <span className="font-body-md text-[14px] text-on-surface-variant">
+              <span className="font-body-md text-[13px] text-on-surface-variant sm:text-[14px]">
                 {slice.name} <span className="text-outline-clay">{slice.value}%</span>
               </span>
             </div>
@@ -286,7 +286,7 @@ function RecentBookingsTable({ bookings }: { bookings: AdminRecentBooking[] }) {
   return (
     <Panel title="Recent Bookings" className="lg:col-span-2">
       <div className="overflow-x-auto">
-        <table className="min-w-full">
+        <table className="min-w-[640px] sm:min-w-full">
           <thead>
             <tr className="border-b border-surface-container text-left">
               {[
@@ -298,7 +298,7 @@ function RecentBookingsTable({ bookings }: { bookings: AdminRecentBooking[] }) {
                 "Status",
               ].map((heading) => (
                 <th
-                  className="pb-3 font-label-caps text-[12px] font-bold uppercase tracking-wider text-outline-clay"
+                  className="pb-3 font-label-caps text-[11px] font-bold uppercase tracking-wider text-outline-clay sm:text-[12px]"
                   key={heading}
                 >
                   {heading}
@@ -309,19 +309,19 @@ function RecentBookingsTable({ bookings }: { bookings: AdminRecentBooking[] }) {
           <tbody>
             {bookings.map((booking) => (
               <tr className="border-b border-surface-container last:border-b-0" key={booking.id}>
-                <td className="py-4 font-body-md text-[14px] font-medium text-charred-wood">
+                <td className="py-4 font-body-md text-[13px] font-medium text-charred-wood sm:text-[14px]">
                   {booking.id}
                 </td>
-                <td className="py-4 font-body-md text-[14px] text-charred-wood">
+                <td className="py-4 font-body-md text-[13px] text-charred-wood sm:text-[14px]">
                   {booking.guest}
                 </td>
-                <td className="py-4 font-body-md text-[14px] text-on-surface-variant">
+                <td className="py-4 font-body-md text-[13px] text-on-surface-variant sm:text-[14px]">
                   {booking.room}
                 </td>
-                <td className="py-4 font-body-md text-[14px] text-on-surface-variant">
+                <td className="py-4 font-body-md text-[13px] text-on-surface-variant sm:text-[14px]">
                   {booking.checkIn}
                 </td>
-                <td className="py-4 font-body-md text-[14px] font-bold text-primary">
+                <td className="py-4 font-body-md text-[13px] font-bold text-primary sm:text-[14px]">
                   {booking.amount}
                 </td>
                 <td className="py-4">
@@ -384,7 +384,7 @@ function AdminDashboardContent({ data }: AdminDashboardViewProps = {}) {
         ))}
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <BarChart
           data={dashboard.revenueData}
           title="Revenue Overview"

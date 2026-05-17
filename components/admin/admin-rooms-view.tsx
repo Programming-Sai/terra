@@ -105,6 +105,11 @@ const emptyRoomForm = (): RoomFormState => ({
   featured: false,
 });
 
+const MAX_ROOM_IMAGES = Math.max(
+  1,
+  Number(process.env.NEXT_PUBLIC_MAX_ROOM_IMAGES ?? "6") || 6,
+);
+
 const mockRooms: RoomRecord[] = [
   {
     id: "1",
@@ -608,7 +613,7 @@ function RoomEditorModal({
                       <input
                         accept="image/*"
                         className="block w-full text-[14px] text-on-surface-variant file:mr-4 file:border-0 file:bg-primary file:px-4 file:py-2 file:font-label-caps file:text-[12px] file:font-bold file:uppercase file:text-white hover:file:bg-laterite-red"
-                        disabled={isUploadingImages || isSaving}
+                        disabled={isUploadingImages || isSaving || form.images.length >= MAX_ROOM_IMAGES}
                         multiple
                         onChange={(event) => onFilesSelected(event.target.files)}
                         type="file"
@@ -617,6 +622,9 @@ function RoomEditorModal({
                     </div>
                     <p className="mt-2 font-body-md text-[12px] text-outline-clay">
                       Upload images from your device. They will be used in the room gallery.
+                    </p>
+                    <p className="mt-1 font-body-md text-[12px] text-outline-clay">
+                      Limit: up to {MAX_ROOM_IMAGES} images per room.
                     </p>
                   </div>
 
@@ -629,7 +637,12 @@ function RoomEditorModal({
                     />
                     <button
                       className="bg-primary px-4 py-3 font-label-caps text-[12px] font-bold uppercase text-white transition-colors hover:bg-laterite-red disabled:cursor-not-allowed disabled:opacity-70"
-                      disabled={!imageUrlDraft.trim() || isUploadingImages || isSaving}
+                      disabled={
+                        !imageUrlDraft.trim() ||
+                        isUploadingImages ||
+                        isSaving ||
+                        form.images.length >= MAX_ROOM_IMAGES
+                      }
                       onClick={onAddImageUrl}
                       type="button"
                     >
@@ -1084,14 +1097,15 @@ export function AdminRoomsView({
           isRecord(payload) && typeof payload.error === "string"
             ? payload.error
             : "Unable to load room details.";
-        throw new Error(message);
+        setEditorError(message);
+        return;
       }
 
       setForm(roomToFormState(payload));
       setImageUrlDraft("");
       setSlugTouched(true);
-    } catch (error) {
-      setEditorError(error instanceof Error ? error.message : "Unable to load room details.");
+    } catch {
+      setEditorError("Unable to load room details.");
     } finally {
       setIsLoadingRoom(false);
     }
@@ -1174,15 +1188,26 @@ export function AdminRoomsView({
     setEditorError(null);
 
     try {
+      if (form.images.length >= MAX_ROOM_IMAGES) {
+        setEditorError(`A room can only have up to ${MAX_ROOM_IMAGES} images.`);
+        return;
+      }
+
       const imageDataUrls = await readFilesAsDataUrls(files);
       if (imageDataUrls.length === 0) return;
+
+      const remainingSlots = MAX_ROOM_IMAGES - form.images.length;
+      if (imageDataUrls.length > remainingSlots) {
+        setEditorError(`A room can only have up to ${MAX_ROOM_IMAGES} images.`);
+        return;
+      }
 
       setForm((currentForm) => ({
         ...currentForm,
         images: [...currentForm.images, ...imageDataUrls],
       }));
-    } catch (error) {
-      setEditorError(error instanceof Error ? error.message : "Unable to upload images.");
+    } catch {
+      setEditorError("Unable to upload images.");
     } finally {
       setIsUploadingImages(false);
     }
@@ -1191,6 +1216,11 @@ export function AdminRoomsView({
   function handleAddImageUrl() {
     const nextUrl = imageUrlDraft.trim();
     if (!nextUrl) return;
+
+    if (form.images.length >= MAX_ROOM_IMAGES) {
+      setEditorError(`A room can only have up to ${MAX_ROOM_IMAGES} images.`);
+      return;
+    }
 
     setForm((currentForm) => ({
       ...currentForm,
@@ -1214,8 +1244,14 @@ export function AdminRoomsView({
       const payload = formStateToPayload(form);
       const slug = payload.slug || slugifyRoomName(payload.name);
 
+      if (payload.images.length > MAX_ROOM_IMAGES) {
+        setEditorError(`A room can only have up to ${MAX_ROOM_IMAGES} images.`);
+        return;
+      }
+
       if (!payload.name || !slug || !payload.description || !payload.bed_type || !payload.room_type || !payload.view_type || !payload.size || !payload.price_per_night || !payload.max_guests) {
-        throw new Error("Please complete all required room fields.");
+        setEditorError("Please complete all required room fields.");
+        return;
       }
 
       const requestBody = {
@@ -1241,12 +1277,14 @@ export function AdminRoomsView({
           isRecord(result) && typeof result.error === "string"
             ? result.error
             : "Unable to save room.";
-        throw new Error(message);
+        setEditorError(message);
+        return;
       }
 
       if (editorMode === "create") {
         if (!isRoomApiRecord(result)) {
-          throw new Error("Unable to save room.");
+          setEditorError("Unable to save room.");
+          return;
         }
 
         const created = result;
@@ -1270,7 +1308,8 @@ export function AdminRoomsView({
         ]);
       } else {
         if (!isRoomApiRecord(result)) {
-          throw new Error("Unable to save room.");
+          setEditorError("Unable to save room.");
+          return;
         }
 
         const updated = result;
@@ -1307,8 +1346,8 @@ export function AdminRoomsView({
       setImageUrlDraft("");
       setSlugTouched(false);
       router.refresh();
-    } catch (error) {
-      setEditorError(error instanceof Error ? error.message : "Unable to save room.");
+    } catch {
+      setEditorError("Unable to save room.");
     } finally {
       setIsSaving(false);
     }
@@ -1335,7 +1374,9 @@ export function AdminRoomsView({
           isRecord(payload) && typeof payload.error === "string"
             ? payload.error
             : "Unable to delete room.";
-        throw new Error(message);
+        setEditorError(message);
+        setEditorOpen(true);
+        return;
       }
 
       setRoomItems((currentRooms) =>
@@ -1347,8 +1388,8 @@ export function AdminRoomsView({
       }
 
       router.refresh();
-    } catch (error) {
-      setEditorError(error instanceof Error ? error.message : "Unable to delete room.");
+    } catch {
+      setEditorError("Unable to delete room.");
       setEditorOpen(true);
     } finally {
       setDeletingRoomId(null);

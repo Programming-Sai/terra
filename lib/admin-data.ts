@@ -526,7 +526,7 @@ export async function getAdminDashboardData() {
         change: percentChange(currentThirtyDayBookings, previousThirtyDayBookings),
         trend: currentThirtyDayBookings >= previousThirtyDayBookings ? ("up" as const) : ("down" as const),
         icon: "event_available",
-        tone: "bg-primary-container text-charred-wood",
+        tone: "bg-primary-fixed text-primary",
       },
       {
         label: "Active Guests",

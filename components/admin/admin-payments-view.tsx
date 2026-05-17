@@ -253,8 +253,8 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="border border-surface-container bg-white p-6">
-      <h2 className="mb-6 font-eczar text-[20px] font-bold text-charred-wood">
+    <section className="overflow-hidden border border-surface-container bg-white p-4 sm:p-6">
+      <h2 className="mb-5 font-eczar text-[18px] font-bold text-charred-wood sm:mb-6 sm:text-[20px]">
         {title}
       </h2>
       {children}
@@ -465,7 +465,7 @@ export function AdminPaymentsView({
         title="Payments"
       />
 
-      <section className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <section className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
           <StatTile key={stat.label} stat={stat} />
         ))}
@@ -473,23 +473,23 @@ export function AdminPaymentsView({
 
       <section className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Section title="Revenue Trend">
-          <div className="flex h-[240px] items-end gap-4 border-b border-l border-surface-container pb-4 pl-4">
+          <div className="flex h-[200px] items-end gap-2 overflow-x-hidden border-b border-l border-surface-container pb-3 pl-2 sm:h-[240px] sm:gap-4 sm:pb-4 sm:pl-4">
             {revenueTrend.map((point) => {
               const maxRevenue = Math.max(...revenueTrend.map((item) => item.revenue));
               const height = Math.max((point.revenue / maxRevenue) * 100, 8);
 
               return (
                 <div
-                  className="flex flex-1 flex-col items-center justify-end gap-3"
+                  className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2 sm:gap-3"
                   key={point.month}
                 >
-                  <div className="flex h-[180px] w-full items-end justify-center">
+                  <div className="flex h-[150px] w-full items-end justify-center sm:h-[180px]">
                     <div
-                      className="w-full max-w-[42px] rounded-t-sm bg-primary"
+                      className="w-full max-w-[28px] rounded-t-sm bg-primary sm:max-w-[42px]"
                       style={{ height: `${height}%` }}
                     />
                   </div>
-                  <span className="font-body-md text-[12px] text-outline-clay">
+                  <span className="text-center font-body-md text-[10px] text-outline-clay sm:text-[12px]">
                     {point.month}
                   </span>
                 </div>
@@ -582,7 +582,7 @@ export function AdminPaymentsView({
 
       <section className="border border-surface-container bg-white">
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="min-w-[860px] sm:min-w-full">
             <thead className="bg-surface-bone">
               <tr className="border-b border-surface-container">
                 {[
@@ -596,7 +596,7 @@ export function AdminPaymentsView({
                   "Actions",
                 ].map((heading) => (
                   <th
-                    className="px-4 py-4 text-left font-label-caps text-[12px] font-bold uppercase tracking-wider text-outline-clay"
+                    className="px-4 py-4 text-left font-label-caps text-[11px] font-bold uppercase tracking-wider text-outline-clay sm:text-[12px]"
                     key={heading}
                   >
                     {heading}
@@ -610,32 +610,32 @@ export function AdminPaymentsView({
                   className="border-b border-surface-container transition-colors hover:bg-surface-bone"
                   key={payment.id}
                 >
-                  <td className="px-4 py-4 font-body-md text-[14px] font-medium text-charred-wood">
+                  <td className="px-4 py-4 font-body-md text-[13px] font-medium text-charred-wood sm:text-[14px]">
                     {payment.id}
                   </td>
                   <td className="px-4 py-4">
-                    <p className="font-body-md text-[14px] font-bold text-charred-wood">
+                    <p className="font-body-md text-[13px] font-bold text-charred-wood sm:text-[14px]">
                       {payment.guestName}
                     </p>
-                    <p className="font-body-md text-[12px] text-outline-clay">
+                    <p className="font-body-md text-[11px] text-outline-clay sm:text-[12px]">
                       {payment.guestEmail}
                     </p>
                   </td>
-                  <td className="px-4 py-4 font-body-md text-[14px] text-on-surface-variant">
+                  <td className="px-4 py-4 font-body-md text-[13px] text-on-surface-variant sm:text-[14px]">
                     {payment.room}
                   </td>
                   <td className="px-4 py-4">
-                    <p className="font-body-md text-[14px] text-charred-wood">
+                    <p className="font-body-md text-[13px] text-charred-wood sm:text-[14px]">
                       {payment.method}
                     </p>
-                    <p className="font-body-md text-[12px] text-outline-clay">
+                    <p className="font-body-md text-[11px] text-outline-clay sm:text-[12px]">
                       {payment.provider}
                     </p>
                   </td>
-                  <td className="px-4 py-4 font-body-md text-[14px] font-bold text-primary">
+                  <td className="px-4 py-4 font-body-md text-[13px] font-bold text-primary sm:text-[14px]">
                     GHS {payment.amount.toLocaleString()}
                   </td>
-                  <td className="px-4 py-4 font-body-md text-[14px] text-on-surface-variant">
+                  <td className="px-4 py-4 font-body-md text-[13px] text-on-surface-variant sm:text-[14px]">
                     {payment.date}
                   </td>
                   <td className="px-4 py-4">

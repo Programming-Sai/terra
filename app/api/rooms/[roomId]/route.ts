@@ -4,6 +4,10 @@ import { serializeRoom, type RoomDbRow } from "@/lib/db-serializers";
 import { requireAdminSession } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
+const MAX_ROOM_IMAGES = Math.max(
+  1,
+  Number(process.env.NEXT_PUBLIC_MAX_ROOM_IMAGES ?? "6") || 6,
+);
 
 function badRequest(message: string) {
   return NextResponse.json({ error: message }, { status: 400 });
@@ -82,6 +86,14 @@ export async function PATCH(
 
     return value;
   });
+
+  const imagesIndex = updates.indexOf("images");
+  if (imagesIndex >= 0) {
+    const imagesValue = body.images;
+    if (Array.isArray(imagesValue) && imagesValue.length > MAX_ROOM_IMAGES) {
+      return badRequest(`A room can only have up to ${MAX_ROOM_IMAGES} images.`);
+    }
+  }
 
   const result = await query(
     `update rooms

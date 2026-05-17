@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
 export const ADMIN_COOKIE_NAME = "terra_lodge_admin_session";
-export const ADMIN_LOGIN_EMAIL = "admin@terrasanta.com";
-export const ADMIN_LOGIN_PASSWORD = "TerraSanta@2026";
+export const ADMIN_LOGIN_EMAIL = process.env.ADMIN_LOGIN_EMAIL ?? "";
+export const ADMIN_LOGIN_PASSWORD = process.env.ADMIN_LOGIN_PASSWORD ?? "";
 
-const ADMIN_SESSION_SECRET = "terra-lodge-admin-session-secret";
+const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET ?? "";
 const ADMIN_SESSION_TTL_SECONDS = 60 * 60 * 12;
 
 const encoder = new TextEncoder();

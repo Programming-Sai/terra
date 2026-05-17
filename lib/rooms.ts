@@ -28,7 +28,7 @@ const stockImages = {
   bathroom:
     "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80",
   living:
-    "https://images.unsplash.com/photo-1560449752-3f3f3d1b4d0c?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1200&q=80",
   suite:
     "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1200&q=80",
   balcony:

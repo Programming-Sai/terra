@@ -295,7 +295,7 @@ function AdminCustomersContent({ customers = mockCustomers }: AdminCustomersView
         title="Customers"
       />
 
-      <section className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
+      <section className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Total Customers" value={customers.length} />
         <MetricCard
           accentClassName="text-green-700"
@@ -314,7 +314,7 @@ function AdminCustomersContent({ customers = mockCustomers }: AdminCustomersView
         />
       </section>
 
-      <section className="mb-6 border border-surface-container bg-white p-6">
+      <section className="mb-6 border border-surface-container bg-white p-4 sm:p-6">
         <div className="relative">
           <Icon
             name="search"
@@ -334,7 +334,7 @@ function AdminCustomersContent({ customers = mockCustomers }: AdminCustomersView
 
       <section className="border border-surface-container bg-white">
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="min-w-[920px] sm:min-w-full">
             <thead className="bg-surface-bone">
               <tr className="border-b border-surface-container">
                 {[
@@ -347,7 +347,7 @@ function AdminCustomersContent({ customers = mockCustomers }: AdminCustomersView
                   "Actions",
                 ].map((heading) => (
                   <th
-                    className="px-4 py-4 text-left font-label-caps text-[12px] font-bold uppercase tracking-wider text-outline-clay"
+                    className="px-4 py-4 text-left font-label-caps text-[11px] font-bold uppercase tracking-wider text-outline-clay sm:text-[12px]"
                     key={heading}
                   >
                     {heading}
@@ -362,30 +362,30 @@ function AdminCustomersContent({ customers = mockCustomers }: AdminCustomersView
                   key={customer.id}
                 >
                   <td className="px-4 py-4">
-                    <p className="font-body-md text-[14px] font-bold text-charred-wood">
+                    <p className="font-body-md text-[13px] font-bold text-charred-wood sm:text-[14px]">
                       {customer.name}
                     </p>
-                    <p className="font-body-md text-[12px] text-outline-clay">
+                    <p className="font-body-md text-[11px] text-outline-clay sm:text-[12px]">
                       ID: {customer.id}
                     </p>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex items-center gap-2 text-[13px] text-charred-wood">
+                    <div className="flex items-center gap-2 text-[12px] text-charred-wood sm:text-[13px]">
                       <Icon name="mail" className="text-[16px] text-outline-clay" />
                       <span>{customer.email}</span>
                     </div>
-                    <div className="mt-2 flex items-center gap-2 text-[13px] text-charred-wood">
+                    <div className="mt-2 flex items-center gap-2 text-[12px] text-charred-wood sm:text-[13px]">
                       <Icon name="call" className="text-[16px] text-outline-clay" />
                       <span>{customer.phone}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 font-body-md text-[14px] font-bold text-charred-wood">
+                  <td className="px-4 py-4 font-body-md text-[13px] font-bold text-charred-wood sm:text-[14px]">
                     {customer.totalBookings}
                   </td>
-                  <td className="px-4 py-4 font-body-md text-[14px] font-bold text-primary">
+                  <td className="px-4 py-4 font-body-md text-[13px] font-bold text-primary sm:text-[14px]">
                     GH₵ {customer.totalSpent.toLocaleString()}
                   </td>
-                  <td className="px-4 py-4 font-body-md text-[14px] text-on-surface-variant">
+                  <td className="px-4 py-4 font-body-md text-[13px] text-on-surface-variant sm:text-[14px]">
                     {customer.lastBooking}
                   </td>
                   <td className="px-4 py-4">

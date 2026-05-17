@@ -18,7 +18,7 @@
 
 # Terra Lodge
 
-Terra Lodge is a Next.js 16 App Router hotel/lodge experience built for a calm, premium booking flow. The app includes a redesigned home page, reusable room listings, detailed room pages, a checkout flow with UI-only payment states, contact/about pages, a shared icon system, and centralized availability search behavior across the site.
+Terra Lodge is a Next.js 16 App Router hotel/lodge experience built for a calm, premium booking flow. The app includes a redesigned home page, reusable room listings, detailed room pages, a checkout flow with Paystack integration, contact/about pages, a shared icon system, centralized availability search behavior across the site, and a protected admin area for managing rooms, bookings, customers, payments, and settings.
 
 ## What This Project Includes
 
@@ -63,7 +63,7 @@ Terra Lodge is a Next.js 16 App Router hotel/lodge experience built for a calm, 
 - React 19
 - TypeScript
 - Tailwind CSS 4
-- Supabase client setup
+- Neon/Postgres data layer
 - `@fontsource/material-symbols-outlined` for the shared icon system
 - `react-datepicker` available in the project dependencies
 
@@ -86,7 +86,26 @@ Terra Lodge is a Next.js 16 App Router hotel/lodge experience built for a calm, 
 - [components/room-detail-view.tsx](components/room-detail-view.tsx) contains the room detail gallery and booking summary UI.
 - [components/checkout-view.tsx](components/checkout-view.tsx) contains the checkout page UI and the feedback modals.
 - [components/home-sections.tsx](components/home-sections.tsx) contains the split home page sections.
+- [app/admin/layout.tsx](app/admin/layout.tsx) defines the admin route shell.
+- [app/admin/page.tsx](app/admin/page.tsx) redirects `/admin` to the dashboard.
+- [app/admin/login/page.tsx](app/admin/login/page.tsx) renders the standalone admin login screen.
+- [app/admin/dashboard/page.tsx](app/admin/dashboard/page.tsx) renders the admin dashboard.
+- [app/admin/bookings/page.tsx](app/admin/bookings/page.tsx) renders the bookings manager.
+- [app/admin/customers/page.tsx](app/admin/customers/page.tsx) renders the customers manager.
+- [app/admin/payments/page.tsx](app/admin/payments/page.tsx) renders the payments manager.
+- [app/admin/rooms/page.tsx](app/admin/rooms/page.tsx) renders the room inventory manager.
+- [app/admin/settings/page.tsx](app/admin/settings/page.tsx) renders the admin settings screen.
+- [components/admin/admin-shell.tsx](components/admin/admin-shell.tsx) contains the responsive admin shell and protected navigation.
+- [components/admin/admin-dashboard-view.tsx](components/admin/admin-dashboard-view.tsx) contains the admin dashboard charts and tables.
+- [components/admin/admin-bookings-view.tsx](components/admin/admin-bookings-view.tsx) contains the bookings manager UI.
+- [components/admin/admin-customers-view.tsx](components/admin/admin-customers-view.tsx) contains the customers manager UI.
+- [components/admin/admin-payments-view.tsx](components/admin/admin-payments-view.tsx) contains the payments manager UI.
+- [components/admin/admin-rooms-view.tsx](components/admin/admin-rooms-view.tsx) contains the room editor, image ordering, tag inputs, and room CRUD UI.
+- [components/admin/admin-settings-view.tsx](components/admin/admin-settings-view.tsx) contains the admin settings UI.
+- [components/admin/admin-pagination.tsx](components/admin/admin-pagination.tsx) contains the reusable admin pagination controls.
 - [lib/rooms.ts](lib/rooms.ts) contains the centralized room inventory and stock image URLs.
+- [lib/admin-auth.ts](lib/admin-auth.ts) contains the admin session helpers and env-based login credentials.
+- [lib/admin-data.ts](lib/admin-data.ts) contains the data shaping layer for the admin dashboard and lists.
 - [lib/supabase/client.ts](lib/supabase/client.ts) contains the browser Supabase client.
 - [lib/supabase/server.ts](lib/supabase/server.ts) contains the server Supabase helper.
 - [next.config.ts](next.config.ts) configures remote image hosts.
@@ -160,6 +179,34 @@ Terra Lodge is a Next.js 16 App Router hotel/lodge experience built for a calm, 
 - The FAB availability modal closes after navigation begins.
 - Checkout feedback modals are controlled by URL params such as `?modal=success`.
 
+## Admin Area
+
+The admin area is available under `/admin` and uses a protected route shell.
+
+- `/admin/login` is a standalone login page.
+- `/admin/dashboard` shows live revenue, booking, occupancy, and recent booking data.
+- `/admin/bookings` manages bookings with filters, pagination, and detail modals.
+- `/admin/customers` derives customer records from booking history.
+- `/admin/payments` derives payment rows from booking/payment states and references.
+- `/admin/rooms` provides room create/edit/delete flows, image ordering, tag inputs, and structured metadata fields.
+- `/admin/settings` provides operational settings UI with low-friction persistence for the current build.
+
+Admin auth is env-driven:
+
+- `ADMIN_LOGIN_EMAIL`
+- `ADMIN_LOGIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
+
+Room image uploads are currently stored as URL or base64 strings in Neon, and the room editor enforces a configurable image cap via:
+
+- `NEXT_PUBLIC_MAX_ROOM_IMAGES`
+
+Customer status is derived from booking history:
+
+- `Active` if the customer has recent booking activity
+- `VIP` if booking count or spend crosses the configured threshold in the data layer
+- `Inactive` if the customer has not booked for a longer period
+
 ## Availability Flow
 
 The same availability values are shared across the app:
@@ -203,6 +250,8 @@ Allowed remote image hosts:
 
 If you add another remote image source, update [next.config.ts](next.config.ts) so the host is whitelisted.
 
+Room images created in the admin editor are stored as ordered URL or base64 strings in the room record, so the first image acts as the main image and the rest remain in gallery order.
+
 ## Icon System
 
 The app uses a centralized Material Symbols icon wrapper:
@@ -222,18 +271,34 @@ This keeps icon usage consistent across:
 
 ## Environment Variables
 
-The current code expects these Supabase environment variables:
+The current app expects these environment variables:
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEON_URL`
+- `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`
+- `PAYSTACK_SECRET_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+- `RESEND_KEY`
+- `RESEND_ME`
+- `ADMIN_LOGIN_EMAIL`
+- `ADMIN_LOGIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
+- `NEXT_PUBLIC_MAX_ROOM_IMAGES`
 
-Set them in `.env.local` for local development.
+Set them in `.env` or `.env.local` for local development.
 
 Example:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEON_URL=postgresql://username:password@your-neon-host.neon.tech/your_database?sslmode=require
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_xxxxx
+PAYSTACK_SECRET_KEY=sk_test_xxxxx
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+RESEND_KEY=re_xxx
+RESEND_ME=onboarding@resend.dev
+ADMIN_LOGIN_EMAIL=admin@terrasanta.com
+ADMIN_LOGIN_PASSWORD=TerraSanta@2026
+ADMIN_SESSION_SECRET=terra-lodge-admin-session-secret
+NEXT_PUBLIC_MAX_ROOM_IMAGES=6
 ```
 
 ## Available Scripts
