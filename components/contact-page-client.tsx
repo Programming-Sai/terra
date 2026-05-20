@@ -17,6 +17,27 @@ type ContactFormState = {
   message: string;
 };
 
+function buildGmailComposeUrl(formData: ContactFormState) {
+  const subject = `Terra Lodge inquiry from ${formData.fullName || "a guest"}`;
+  const bodyLines = [
+    `Name: ${formData.fullName || "Not provided"}`,
+    `Email: ${formData.email || "Not provided"}`,
+    `Phone: ${formData.phone || "Not provided"}`,
+    "",
+    formData.message || "No message provided.",
+  ];
+
+  const params = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: siteContent.contact.email,
+    su: subject,
+    body: bodyLines.join("\n"),
+  });
+
+  return `https://mail.google.com/mail/?${params.toString()}`;
+}
+
 export default function ContactPageClient({
   heroRoom,
 }: {
@@ -47,19 +68,11 @@ export default function ContactPageClient({
     });
 
     try {
-      const response = await fetch("/api/contact", {
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      });
+      const composeUrl = buildGmailComposeUrl(formData);
+      const gmailWindow = window.open(composeUrl, "_blank", "noopener,noreferrer");
 
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-          | { error?: string }
-          | null;
-        throw new Error(payload?.error ?? "Unable to send message.");
+      if (!gmailWindow) {
+        throw new Error("Unable to open Gmail. Please allow pop-ups and try again.");
       }
 
       setFormData({
@@ -72,13 +85,13 @@ export default function ContactPageClient({
       setSubmitState({
         kind: "success",
         message:
-          "Thanks for reaching out. Your message has been sent and we will get back to you shortly.",
+          "A Gmail draft has been opened with your details. Review it there and send when you're ready.",
       });
     } catch {
       setSubmitState({
         kind: "error",
         message:
-          "We could not send your message right now. Please try again or reach us by email.",
+          "We could not open Gmail right now. Please allow pop-ups or try again.",
       });
     } finally {
       setIsSubmitting(false);
