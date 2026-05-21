@@ -9,7 +9,13 @@ import { siteContent } from "@/lib/site-content";
 
 const bedTypes = ["1 King", "1 Queen", "2 Queen"] as const;
 const roomTypes = ["Suite", "Deluxe", "Premium"] as const;
-const amenityOptions = ["A/C", "Wi-Fi", "Mini Bar", "Balcony", "Bathtub"] as const;
+const amenityOptions = [
+  "A/C",
+  "Wi-Fi",
+  "Mini Bar",
+  "Balcony",
+  "Bathtub",
+] as const;
 const viewTypes = ["City View", "Garden View", "Pool View"] as const;
 
 function FilterPanel({
@@ -124,7 +130,9 @@ function FilterPanel({
             className="w-full h-[4px] bg-[#f0eded] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-[16px] [&::-webkit-slider-thumb]:h-[16px] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#4a1e00] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[16px] [&::-moz-range-thumb]:h-[16px] [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#4a1e00] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
             max="1000"
             min="0"
-            onChange={(event) => onPriceRangeChange(Number.parseInt(event.target.value, 10))}
+            onChange={(event) =>
+              onPriceRangeChange(Number.parseInt(event.target.value, 10))
+            }
             step="50"
             type="range"
             value={priceRange[1]}
@@ -146,7 +154,9 @@ function FilterPanel({
         </div>
         <select
           className="w-full bg-white border border-[#f0eded] px-[12px] py-[8px] font-['Montserrat:Regular',sans-serif] text-[14px] text-[#2f2f2f]"
-          onChange={(event) => onMaxGuestsChange(Number.parseInt(event.target.value, 10))}
+          onChange={(event) =>
+            onMaxGuestsChange(Number.parseInt(event.target.value, 10))
+          }
           value={maxGuests}
         >
           <option value={1}>1 Guest</option>
@@ -162,7 +172,10 @@ function FilterPanel({
         </div>
         <div className="flex flex-col gap-[8px]">
           {bedTypes.map((bed) => (
-            <label className="flex items-center gap-[8px] cursor-pointer" key={bed}>
+            <label
+              className="flex items-center gap-[8px] cursor-pointer"
+              key={bed}
+            >
               <input
                 checked={selectedBedType === bed}
                 className="w-[16px] h-[16px]"
@@ -192,7 +205,10 @@ function FilterPanel({
         </div>
         <div className="flex flex-col gap-[8px]">
           {roomTypes.map((type) => (
-            <label className="flex items-center gap-[8px] cursor-pointer" key={type}>
+            <label
+              className="flex items-center gap-[8px] cursor-pointer"
+              key={type}
+            >
               <input
                 checked={selectedRoomType === type}
                 className="w-[16px] h-[16px]"
@@ -222,7 +238,10 @@ function FilterPanel({
         </div>
         <div className="flex flex-col gap-[8px]">
           {amenityOptions.map((amenity) => (
-            <label className="flex items-center gap-[8px] cursor-pointer" key={amenity}>
+            <label
+              className="flex items-center gap-[8px] cursor-pointer"
+              key={amenity}
+            >
               <input
                 checked={selectedAmenities.includes(amenity)}
                 className="w-[16px] h-[16px]"
@@ -243,7 +262,10 @@ function FilterPanel({
         </div>
         <div className="flex flex-col gap-[8px]">
           {viewTypes.map((view) => (
-            <label className="flex items-center gap-[8px] cursor-pointer" key={view}>
+            <label
+              className="flex items-center gap-[8px] cursor-pointer"
+              key={view}
+            >
               <input
                 checked={selectedViewType === view}
                 className="w-[16px] h-[16px]"
@@ -363,7 +385,9 @@ export default function RoomCatalog({
   rooms: readonly Room[];
 }) {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [searchTerm, setSearchTerm] = useState(initialFilters?.searchTerm ?? "");
+  const [searchTerm, setSearchTerm] = useState(
+    initialFilters?.searchTerm ?? "",
+  );
   const [checkIn, setCheckIn] = useState(initialFilters?.checkIn ?? "");
   const [checkOut, setCheckOut] = useState(initialFilters?.checkOut ?? "");
   const [selectedBedType, setSelectedBedType] = useState<string>(
@@ -372,7 +396,9 @@ export default function RoomCatalog({
   const [selectedRoomType, setSelectedRoomType] = useState<string>(
     initialFilters?.selectedRoomType ?? "",
   );
-  const [maxGuests, setMaxGuests] = useState<number>(initialFilters?.maxGuests ?? 1);
+  const [maxGuests, setMaxGuests] = useState<number>(
+    initialFilters?.maxGuests ?? 1,
+  );
   const [selectedViewType, setSelectedViewType] = useState<string>(
     initialFilters?.selectedViewType ?? "",
   );
@@ -435,7 +461,9 @@ export default function RoomCatalog({
 
   const toggleAmenity = (amenity: string) => {
     setSelectedAmenities((prev) =>
-      prev.includes(amenity) ? prev.filter((item) => item !== amenity) : [...prev, amenity],
+      prev.includes(amenity)
+        ? prev.filter((item) => item !== amenity)
+        : [...prev, amenity],
     );
     setCurrentPage(1);
   };
@@ -506,7 +534,7 @@ export default function RoomCatalog({
             src={rooms[0]?.image ?? siteContent.home.hero.imageSrc}
           />
         </div>
-        <div className="absolute inset-0 bg-[rgba(47,47,47,0.85)]" />
+        <div className="absolute inset-0 bg-[#6c2f00]/90 mix-blend-multiply" />
         <div className="max-w-[1152px] mx-auto px-[24px] relative z-10">
           <div className="flex flex-col gap-3 items-center mb-[24px]">
             <div className="bg-[rgba(238,220,130,0.9)] content-stretch flex items-start justify-center px-[16px] py-[4px] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0">
@@ -576,7 +604,9 @@ export default function RoomCatalog({
           <div className="flex flex-col gap-8 md:gap-12">
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex flex-col font-['Nimbus_Sans:Bold',sans-serif] justify-center leading-[0] not-italic text-[#2f2f2f] text-[16px]">
-                <p className="leading-[24px]">{filteredRooms.length} Rooms Available</p>
+                <p className="leading-[24px]">
+                  {filteredRooms.length} Rooms Available
+                </p>
               </div>
               <p className="lg:hidden text-[12px] text-outline-clay font-body-md">
                 Use filters to narrow the list for mobile browsing.
@@ -589,7 +619,9 @@ export default function RoomCatalog({
                   <p className="leading-[24px] mb-0">
                     No rooms match your current filters.
                   </p>
-                  <p className="leading-[24px]">Please adjust your search criteria.</p>
+                  <p className="leading-[24px]">
+                    Please adjust your search criteria.
+                  </p>
                 </div>
               </div>
             ) : (

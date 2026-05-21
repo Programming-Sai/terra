@@ -69,10 +69,16 @@ export default function ContactPageClient({
 
     try {
       const composeUrl = buildGmailComposeUrl(formData);
-      const gmailWindow = window.open(composeUrl, "_blank", "noopener,noreferrer");
+      const gmailWindow = window.open(
+        composeUrl,
+        "_blank",
+        "noopener,noreferrer",
+      );
 
       if (!gmailWindow) {
-        throw new Error("Unable to open Gmail. Please allow pop-ups and try again.");
+        throw new Error(
+          "Unable to open Gmail. Please allow pop-ups and try again.",
+        );
       }
 
       setFormData({
@@ -127,7 +133,7 @@ export default function ContactPageClient({
             src={heroRoomImage.image}
           />
         </div>
-        <div className="absolute inset-0 bg-charred-wood/85" />
+        <div className="absolute inset-0 bg-[#6c2f00]/90 mix-blend-multiply" />
         <div className="relative z-10 mx-auto max-w-[1152px] px-6 md:px-section-padding">
           <div className="flex flex-col items-center gap-3 text-center">
             <span className="inline-flex bg-dry-grass/90 px-4 py-1 font-label-caps text-[10px] font-bold uppercase tracking-[0.2em] text-charred-wood">
@@ -293,8 +299,14 @@ export default function ContactPageClient({
                   value={siteContent.contact.officeHours}
                   subvalue="Daily"
                 />
-                <HoursRow label="Check-in" value={siteContent.contact.checkIn} />
-                <HoursRow label="Check-out" value={siteContent.contact.checkOut} />
+                <HoursRow
+                  label="Check-in"
+                  value={siteContent.contact.checkIn}
+                />
+                <HoursRow
+                  label="Check-out"
+                  value={siteContent.contact.checkOut}
+                />
               </div>
             </div>
           </div>

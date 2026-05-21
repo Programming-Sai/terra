@@ -143,8 +143,8 @@ export const siteContent = {
       ctaPrimary: "View Rooms",
       ctaSecondary: "Contact Us",
       imageAlt: "Terra Lodge exterior with clean pathways",
-      imageSrc:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuD6QyRAJzExUYQqgcJW1sw5TJ-0B1_O_kknMgaFEHU2yzhxcXHx9hqtQDtGe3VO5HI3aTSHohNa_iQMsRNLa7SrFyx7kBscWv6ye9J91ZYWZvIb4lYV9TpmLILLHLafTCV7Ko_4rUClM-VTiQv7M2neLHW1znTdkM6nhP0Rw5GWqPNtLTMRSEjg-GNbGoNz8gZQrixSaML9fzeVoMwjbUrWZDXMLekhMPHUcuDfTXhG_EwCUTLhQTqTLNMuRao-ojqZBatTi9PHynm6",
+      imageSrc: "/terra-santa-lodge.jpg",
+      // "https://lh3.googleusercontent.com/aida-public/AB6AXuD6QyRAJzExUYQqgcJW1sw5TJ-0B1_O_kknMgaFEHU2yzhxcXHx9hqtQDtGe3VO5HI3aTSHohNa_iQMsRNLa7SrFyx7kBscWv6ye9J91ZYWZvIb4lYV9TpmLILLHLafTCV7Ko_4rUClM-VTiQv7M2neLHW1znTdkM6nhP0Rw5GWqPNtLTMRSEjg-GNbGoNz8gZQrixSaML9fzeVoMwjbUrWZDXMLekhMPHUcuDfTXhG_EwCUTLhQTqTLNMuRao-ojqZBatTi9PHynm6",
     },
     welcome: {
       eyebrow: "Welcome",

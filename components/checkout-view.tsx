@@ -204,7 +204,7 @@ function SuccessModal({
 
 function FailedModal({ onClose }: { onClose: () => void }) {
   return (
-      <ModalShell
+    <ModalShell
       icon={<Icon name="error" className="text-3xl" />}
       message={siteContent.checkout.failureMessage}
       onClose={onClose}
@@ -312,7 +312,8 @@ export default function CheckoutView({
   const subtotal = room.priceValue * nights * booking.rooms;
   const bookingReference = completedReference || "";
   const isRoomUnavailable =
-    room.isActive === false || (room.availabilityStatus ?? "available") !== "available";
+    room.isActive === false ||
+    (room.availabilityStatus ?? "available") !== "available";
   const isCheckoutBlocked = isRoomUnavailable || bookingConflict;
   const blockedMessage = isRoomUnavailable
     ? "This room is currently unavailable."
@@ -457,14 +458,19 @@ export default function CheckoutView({
 
             const verifyData = (await verifyResponse.json()) as VerifyResponse;
             if (typeof window !== "undefined") {
-              window.localStorage.setItem("terra:last-booked-room-id", String(room.id));
+              window.localStorage.setItem(
+                "terra:last-booked-room-id",
+                String(room.id),
+              );
               window.localStorage.setItem(
                 "terra:last-booked-reference",
                 verifyData.booking.paystack_reference ?? reference,
               );
               window.dispatchEvent(new Event("terra-booking-updated"));
             }
-            setCompletedReference(verifyData.booking.paystack_reference ?? reference);
+            setCompletedReference(
+              verifyData.booking.paystack_reference ?? reference,
+            );
             setModalInUrl("success");
           } catch {
             void markBookingFailed();
@@ -494,7 +500,7 @@ export default function CheckoutView({
             src={room.image}
           />
         </div>
-        <div className="absolute inset-0 bg-charred-wood/85" />
+        <div className="absolute inset-0 bg-[#6c2f00]/90 mix-blend-multiply" />
         <div className="max-w-[1152px] mx-auto px-6 md:px-section-padding relative z-10">
           <div className="flex flex-col gap-3 items-center text-center">
             <span className="inline-flex bg-dry-grass/90 text-charred-wood px-4 py-1 font-label-caps text-[10px] font-bold uppercase tracking-[0.2em]">
@@ -549,7 +555,9 @@ export default function CheckoutView({
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-body-md text-sm text-charred-wood">2:00 PM</p>
+                    <p className="font-body-md text-sm text-charred-wood">
+                      2:00 PM
+                    </p>
                   </div>
                 </div>
 
@@ -563,7 +571,9 @@ export default function CheckoutView({
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-body-md text-sm text-charred-wood">11:00 AM</p>
+                    <p className="font-body-md text-sm text-charred-wood">
+                      11:00 AM
+                    </p>
                   </div>
                 </div>
 
@@ -603,7 +613,8 @@ export default function CheckoutView({
               <div className="flex flex-col gap-4 mt-6">
                 <div className="flex items-center justify-between pb-4 border-b border-surface-container">
                   <p className="font-body-md text-sm text-on-surface-variant">
-                    GHS {room.priceValue} x {nights} nights x {booking.rooms} room
+                    GHS {room.priceValue} x {nights} nights x {booking.rooms}{" "}
+                    room
                   </p>
                   <p className="font-body-md text-sm text-charred-wood">
                     GHS {subtotal.toLocaleString()}
@@ -683,40 +694,42 @@ export default function CheckoutView({
                     />
                   </div>
 
-                <button
-                  className="w-full mt-2 bg-primary text-white px-6 py-4 font-label-caps text-sm font-bold uppercase hover:bg-laterite-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isLoading || isCheckoutBlocked}
-                  onClick={handlePay}
-                  type="button"
-                >
-                  {isCheckoutBlocked
-                    ? "Unavailable"
-                    : isLoading
-                      ? "Processing..."
-                      : "Pay with Paystack"}
-                </button>
-              </form>
+                  <button
+                    className="w-full mt-2 bg-primary text-white px-6 py-4 font-label-caps text-sm font-bold uppercase hover:bg-laterite-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoading || isCheckoutBlocked}
+                    onClick={handlePay}
+                    type="button"
+                  >
+                    {isCheckoutBlocked
+                      ? "Unavailable"
+                      : isLoading
+                        ? "Processing..."
+                        : "Pay with Paystack"}
+                  </button>
+                </form>
 
-              <div className="mt-6 text-center">
-                <p className="font-body-md text-xs text-outline-clay leading-relaxed">
-                  Secure payment. You won&apos;t be charged yet.
-                </p>
-              </div>
+                <div className="mt-6 text-center">
+                  <p className="font-body-md text-xs text-outline-clay leading-relaxed">
+                    Secure payment. You won&apos;t be charged yet.
+                  </p>
+                </div>
 
-              {isCheckoutBlocked ? (
-                <div className="mt-4 rounded-sm border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                  <div className="flex items-start gap-3">
-                    <Icon name="warning" className="mt-0.5 text-amber-700" />
-                    <div>
-                      <p className="font-label-caps text-[11px] font-bold uppercase tracking-widest">
-                        Booking Blocked
-                      </p>
-                      <p className="mt-1 font-body-md leading-relaxed">{blockedMessage}</p>
+                {isCheckoutBlocked ? (
+                  <div className="mt-4 rounded-sm border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                    <div className="flex items-start gap-3">
+                      <Icon name="warning" className="mt-0.5 text-amber-700" />
+                      <div>
+                        <p className="font-label-caps text-[11px] font-bold uppercase tracking-widest">
+                          Booking Blocked
+                        </p>
+                        <p className="mt-1 font-body-md leading-relaxed">
+                          {blockedMessage}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : null}
-            </div>
+                ) : null}
+              </div>
             </article>
 
             <article className="bg-white border border-surface-container p-6 flex items-center justify-center gap-3">

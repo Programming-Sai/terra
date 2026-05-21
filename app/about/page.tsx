@@ -76,6 +76,7 @@ export default function AboutPage() {
               sizes="100vw"
               src={siteContent.about.hero.imageSrc}
             />
+            <div className="absolute inset-0 bg-[#6c2f00]/60 mix-blend-multiply" />
           </div>
           <div className="absolute inset-0 bg-charred-wood/35" />
           <div className="relative z-10 mx-auto max-w-6xl px-6 md:px-section-padding py-24 md:py-32 text-center">
@@ -164,7 +165,11 @@ export default function AboutPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {values.map((value, index) => (
                 <ValueCard
-                  className={index === values.length - 1 ? "md:col-span-2 lg:col-span-1" : ""}
+                  className={
+                    index === values.length - 1
+                      ? "md:col-span-2 lg:col-span-1"
+                      : ""
+                  }
                   key={value.title}
                   value={value}
                 />
