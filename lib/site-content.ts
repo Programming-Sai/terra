@@ -44,7 +44,7 @@ export const siteContent = {
   home: {
     hero: {
       badge: "Welcome",
-      title: "Experience Authentic Comfort",
+      title: "Experience Authentic Comfort.",
       description:
         "Quality accommodation with traditional Ghanaian hospitality. Your serene home away from home.",
       imageAlt: "A clean, sunlit bedroom in Terra Lodge",
