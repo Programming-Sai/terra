@@ -122,33 +122,28 @@ export async function DELETE(
   if (unauthorized) return unauthorized;
 
   const { roomId } = await params;
-  const activeBookings = await query(
+  const bookingHistory = await query(
     `select id
      from bookings
      where room_id = $1
-       and booking_status in ('pending', 'confirmed')
-       and check_in_date <= current_date
-       and check_out_date > current_date
      limit 1`,
     [roomId],
   );
 
-  if ((activeBookings.rowCount ?? 0) > 0) {
+  if ((bookingHistory.rowCount ?? 0) > 0) {
     return NextResponse.json(
       {
         error:
-          "This room is currently booked. Delete the booking first or wait until the stay is finished.",
+          "This room has booking history and cannot be deleted yet. Remove the related bookings first if you want to permanently delete it.",
       },
       { status: 409 },
     );
   }
 
   const result = await query(
-    `update rooms
-     set is_active = false,
-         availability_status = 'closed'
+    `delete from rooms
      where id = $1
-     returning id`,
+      returning id`,
     [roomId],
   );
 

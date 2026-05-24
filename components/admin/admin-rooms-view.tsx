@@ -1639,15 +1639,7 @@ export function AdminRoomsView({
       }
 
       setRoomItems((currentRooms) =>
-        currentRooms.map((item) =>
-          item.id === room.id
-            ? {
-                ...item,
-                status: "Deleted",
-                currentOccupancy: "Deleted",
-              }
-            : item,
-        ),
+        currentRooms.filter((item) => item.id !== room.id),
       );
 
       if (selectedRoom?.id === room.id) {
