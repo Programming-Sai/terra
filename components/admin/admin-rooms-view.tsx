@@ -22,6 +22,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/icon";
 import type { AdminRoomRecord } from "@/lib/admin-data";
+import type { AmenityRecord } from "@/lib/amenities";
 import { roomInventory } from "@/lib/rooms";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { AdminConfirmModal } from "@/components/admin/admin-confirm-modal";
@@ -536,8 +537,117 @@ function TagInput({
           />
         </div>
       </div>
-      <p className="mt-2 font-body-md text-[12px] text-outline-clay">
+  <p className="mt-2 font-body-md text-[12px] text-outline-clay">
         {helpText ?? "Press Enter or comma to add a tag."}
+      </p>
+    </div>
+  );
+}
+
+function TagSelectInput({
+  label,
+  value,
+  options,
+  helpText,
+  onChange,
+}: {
+  label: string;
+  value: string[];
+  options: string[];
+  helpText?: string;
+  onChange: (nextValue: string[]) => void;
+}) {
+  const [selectedValue, setSelectedValue] = useState("");
+  const tags = value;
+  const availableOptions = options.filter(
+    (option) =>
+      !tags.some((item) => item.toLowerCase() === option.toLowerCase()),
+  );
+  const visibleSelectedValue = availableOptions.some(
+    (option) => option.toLowerCase() === selectedValue.toLowerCase(),
+  )
+    ? selectedValue
+    : "";
+
+  function addSelectedOption() {
+    if (!selectedValue) return;
+
+    const normalized = selectedValue.trim();
+    if (!normalized) return;
+
+    if (!tags.some((item) => item.toLowerCase() === normalized.toLowerCase())) {
+      onChange([...tags, normalized]);
+    }
+
+    setSelectedValue("");
+  }
+
+  return (
+    <div className="lg:col-span-2">
+      <label className="mb-2 block font-label-caps text-[12px] font-bold uppercase tracking-widest text-outline-clay">
+        {label}
+      </label>
+      <div className="border border-surface-container bg-white p-4">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div>
+            <label className="mb-2 block font-label-caps text-[10px] font-bold uppercase tracking-widest text-outline-clay">
+              Select Amenity
+            </label>
+            <select
+              className="w-full border border-surface-container bg-surface-bone px-4 py-3 font-body-md text-[14px] text-charred-wood outline-none transition-colors focus:border-primary"
+              onChange={(event) => setSelectedValue(event.target.value)}
+              value={visibleSelectedValue}
+            >
+              <option value="">Choose an amenity</option>
+              {availableOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            className="inline-flex cursor-pointer items-center justify-center border border-primary bg-primary px-5 py-3 font-label-caps text-[11px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-laterite-red disabled:cursor-not-allowed disabled:opacity-70"
+            disabled={!visibleSelectedValue}
+            onClick={addSelectedOption}
+            type="button"
+          >
+            Add Amenity
+          </button>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tags.map((item) => (
+            <button
+              key={item}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-surface-container bg-surface-bone px-3 py-1.5 font-body-md text-[13px] text-charred-wood transition-colors hover:border-primary hover:bg-primary-fixed hover:text-primary"
+              onClick={() =>
+                onChange(
+                  tags.filter(
+                    (current) => current.toLowerCase() !== item.toLowerCase(),
+                  ),
+                )
+              }
+              type="button"
+            >
+              <span>{item}</span>
+              <span className="text-outline-clay">x</span>
+            </button>
+          ))}
+        </div>
+
+        {availableOptions.length > 0 ? (
+          <p className="mt-3 font-body-md text-[12px] text-outline-clay">
+            Choose from the approved amenities list. Click a tag to remove it.
+          </p>
+        ) : (
+          <p className="mt-3 font-body-md text-[12px] text-outline-clay">
+            All approved amenities have already been added.
+          </p>
+        )}
+      </div>
+      <p className="mt-2 font-body-md text-[12px] text-outline-clay">
+        {helpText ?? "Select an amenity from the list and click Add."}
       </p>
     </div>
   );
@@ -612,6 +722,7 @@ function RoomEditorModal({
   isSaving,
   error,
   invalidFields,
+  amenityOptions,
   imageUrlDraft,
   isUploadingImages,
   sensors,
@@ -631,6 +742,7 @@ function RoomEditorModal({
   isSaving: boolean;
   error: string | null;
   invalidFields: Array<keyof RoomFormState>;
+  amenityOptions: string[];
   imageUrlDraft: string;
   isUploadingImages: boolean;
   sensors: ReturnType<typeof useSensors>;
@@ -939,11 +1051,11 @@ function RoomEditorModal({
               />
             </div>
 
-            <TagInput
-              helpText="Add as many amenities as you want. Press Enter or comma to add each one."
+            <TagSelectInput
+              helpText="Choose from the approved amenities list."
               label="Amenities"
               onChange={(nextValue) => onChange("amenities", nextValue)}
-              placeholder="Wi-Fi"
+              options={amenityOptions}
               value={form.amenities}
             />
 
@@ -1069,6 +1181,7 @@ function RoomEditorModal({
 
 type AdminRoomsViewProps = {
   rooms?: AdminRoomRecord[];
+  amenities?: AmenityRecord[];
 };
 
 function slugifyRoomName(name: string) {
@@ -1147,6 +1260,7 @@ function formStateToPayload(form: RoomFormState) {
 
 export function AdminRoomsView({
   rooms: roomsProp = mockRooms,
+  amenities = [],
 }: AdminRoomsViewProps = {}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
@@ -1167,6 +1281,22 @@ export function AdminRoomsView({
   const [form, setForm] = useState<RoomFormState>(emptyRoomForm());
   const router = useRouter();
   const pageSize = 6;
+  const amenityOptions = useMemo(() => {
+    const options = amenities
+      .filter((amenity) => amenity.is_active)
+      .map((amenity) => amenity.title.trim())
+      .filter(Boolean);
+
+    const unique = new Map<string, string>();
+    for (const option of options) {
+      const key = option.toLowerCase();
+      if (!unique.has(key)) {
+        unique.set(key, option);
+      }
+    }
+
+    return Array.from(unique.values()).sort((a, b) => a.localeCompare(b));
+  }, [amenities]);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, {
@@ -1742,6 +1872,7 @@ export function AdminRoomsView({
       {editorOpen ? (
         <RoomEditorModal
           error={editorError}
+          amenityOptions={amenityOptions}
           invalidFields={invalidFields}
           form={form}
           isLoading={isLoadingRoom}
