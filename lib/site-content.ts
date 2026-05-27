@@ -22,6 +22,8 @@ export const siteContent = {
     checkIn: "2:00 PM",
     checkOut: "11:00 AM",
     phoneSupport: "Available 24/7",
+    heroImageSrc: "/spots/spot-3-reception.jpeg",
+    heroImageAlt: "Reception area at Terra Lodge",
   },
   socialLinks: [
     {
@@ -47,9 +49,8 @@ export const siteContent = {
       title: "Experience Authentic Comfort.",
       description:
         "Quality accommodation with traditional Ghanaian hospitality. Your serene home away from home.",
-      imageAlt: "A clean, sunlit bedroom in Terra Lodge",
-      imageSrc: "/terra-santa-lodge.jpg",
-      // "https://lh3.googleusercontent.com/aida-public/AB6AXuCTlrmwjBV3wjEMNgLFGoZn8HZ-OKbxA5RVS6wH1nXZqH4vJ7zvWP0F4d_hd-V6SwqCQ81ZIVoMT2OUtTz3x_HXTIwiSlGsuqPiKX0dD83GTaDeFBvkWLBUGMZyUDoIC7ht9rHvfUigz3Oq7H2qICVQKXV-Re-7e-nTJlHQ-tcQWyGN0IpblXdifJrC0j1bkV03ocxo7Yc87d68936hE_gVsb00cYEfzXsAwM8uQx3bR0JgnxywA1F_wzsBRGFEJCNfWm7w0jf-Ki93",
+      imageAlt: "Terra Lodge entrance with warm evening light",
+      imageSrc: "/spots/spot-5-entrance.jpeg",
     },
     amenities: [
       {
@@ -167,9 +168,8 @@ export const siteContent = {
         title: "Why Stay With Us?",
         description:
           "At Terra Lodge, we prioritize your peace and comfort. Our lodge is built to offer a blend of traditional aesthetics and modern functionality.",
-        imageAlt: "Terra Lodge exterior with clean pathways",
-        imageSrc: "/terra-santa-lodge.jpg",
-        // "https://lh3.googleusercontent.com/aida-public/AB6AXuD6QyRAJzExUYQqgcJW1sw5TJ-0B1_O_kknMgaFEHU2yzhxcXHx9hqtQDtGe3VO5HI3aTSHohNa_iQMsRNLa7SrFyx7kBscWv6ye9J91ZYWZvIb4lYV9TpmLILLHLafTCV7Ko_4rUClM-VTiQv7M2neLHW1znTdkM6nhP0Rw5GWqPNtLTMRSEjg-GNbGoNz8gZQrixSaML9fzeVoMwjbUrWZDXMLekhMPHUcuDfTXhG_EwCUTLhQTqTLNMuRao-ojqZBatTi9PHynm6",
+        imageAlt: "Reception area at Terra Lodge",
+        imageSrc: "/spots/spot-3-reception.jpeg",
         caption: "Experience Accra's Finest",
       },
       featuredRooms: {
@@ -202,27 +202,48 @@ export const siteContent = {
         "A calm, welcoming lodge built around modern comfort, local character, and thoughtful service.",
       ctaPrimary: "View Rooms",
       ctaSecondary: "Contact Us",
-      imageAlt: "Terra Lodge exterior with clean pathways",
-      imageSrc: "/terra-santa-lodge.jpg",
-      // "https://lh3.googleusercontent.com/aida-public/AB6AXuD6QyRAJzExUYQqgcJW1sw5TJ-0B1_O_kknMgaFEHU2yzhxcXHx9hqtQDtGe3VO5HI3aTSHohNa_iQMsRNLa7SrFyx7kBscWv6ye9J91ZYWZvIb4lYV9TpmLILLHLafTCV7Ko_4rUClM-VTiQv7M2neLHW1znTdkM6nhP0Rw5GWqPNtLTMRSEjg-GNbGoNz8gZQrixSaML9fzeVoMwjbUrWZDXMLekhMPHUcuDfTXhG_EwCUTLhQTqTLNMuRao-ojqZBatTi9PHynm6",
+      imageAlt: "Terra Lodge entrance with warm evening light",
+      imageSrc: "/spots/spot-5-entrance.jpeg",
     },
+    guestSnapshot: [
+      {
+        label: "Location",
+        value: "Quiet residential area in Adenta, Accra",
+      },
+      {
+        label: "Best for",
+        value: "Solo travelers, couples, families, business stays",
+      },
+      {
+        label: "Check-in / out",
+        value: "2:00 PM / 11:00 AM",
+      },
+      {
+        label: "Transport",
+        value: "Easy access to taxis and ride-hailing",
+      },
+    ],
+    guestNeeds: [
+      "Private rooms with air conditioning, Wi-Fi, and private bathrooms.",
+      "Parking and food options that make longer stays simpler.",
+      "A calm, low-stress property that is easy to settle into.",
+      "A practical base for getting around Accra by taxi or ride-hailing.",
+    ],
     welcome: {
       eyebrow: "Welcome",
       title: "Comfort that feels grounded.",
       description:
         "Terra Lodge is designed for travelers who want a peaceful place to stay without losing the convenience of city access. We combine warm hospitality with practical details that make each visit easier.",
       imageAlt: "Guest room at Terra Lodge",
-      imageSrc:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuA_xe9QS4GT97iJC16ONVhVClJiayMmfdKzNrw0JiCR7XVDmq_AVCPDWy_Vyks-OgkQCKVFM2b0MOuJF5Mk2vrCQGfdEV7u8bBIDXuVq5AWBCNC5ingfKtgf_UIAGfonHJAQQbZgsoCh2b1-c-nX7vkpLgMh2j9WRksz4iMf_aUqnEnestEarD3QpzTuLEbD29IjB3yUdpW1W8wN6Ih55OTC4_7Qu5S2j6hk1w8o1c3pkKUMtz6W1JNln31LTXfuonmL7ZSvp1Xs_au",
+      imageSrc: "/spots/spot-2.jpeg",
     },
     commitment: {
       eyebrow: "Our Commitment",
       title: "Quality service, quiet stays.",
       description:
         "From the moment you arrive, we aim to make the experience easy and reassuring. Our rooms, shared spaces, and hospitality approach are all built around a simple idea: guests should feel cared for.",
-      imageAlt: "Spacious living area in Terra Lodge",
-      imageSrc:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuALWIiOef8XJdbvWtiPwYldrrbyL7KbtvLoErLYF9kh-kb1V9eznLKwTGcYYeqy5CXaPTHIFVSJkOl9OLoIIEB8FqwWHYXUcuI8y2gqmdVQLv7c6YwaeGXCP5aW_-EuoPos-GkEfTUQTRdLKzG1T8VlkBncext7jgf0QErH-rUOIv7CFf8ReemeA2ZyjRdbUNmafoHRO7enO2uNtrJloWTybIbArPtKfKHBIMBrhTjL2kZJ6zNx5bCY5niDadADGRkVKCvFJUArwmRb",
+      imageAlt: "A quiet scenic view from Terra Lodge",
+      imageSrc: "/spots/spot-4-mountain-view.jpeg",
     },
     values: [
       {
@@ -269,6 +290,8 @@ export const siteContent = {
     heroTitle: "Functional Sanctuaries",
     heroDescription:
       "Comfortable, clean, and well-equipped rooms designed for a restful stay in the heart of the city.",
+    heroImageSrc: "/spots/spot-5-entrance.jpeg",
+    heroImageAlt: "Terra Lodge entrance with warm evening light",
     pageTitle: "Rooms | Terra Lodge",
     pageDescription:
       "Browse the full Terra Lodge room collection, rates, filters, and booking options.",

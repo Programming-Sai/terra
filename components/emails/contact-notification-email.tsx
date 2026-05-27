@@ -38,24 +38,30 @@ export function ContactNotificationEmail({
               Someone reached out through the website contact form and left the
               details below.
             </Text>
+            <Section style={heroMeta}>
+              <Text style={heroMetaLabel}>Sender</Text>
+              <Text style={heroMetaValue}>{fullName}</Text>
+            </Section>
           </Section>
 
           <Section style={card}>
-            <Text style={sectionEyebrow}>Sender Details</Text>
-            <Text style={line}>
-              <strong>Name:</strong> {fullName}
-            </Text>
-            <Text style={line}>
-              <strong>Email:</strong> {email}
-            </Text>
-            <Text style={line}>
-              <strong>Phone:</strong> {phone || "Not provided"}
-            </Text>
+            <Section style={stack}>
+              <Text style={sectionEyebrow}>Sender Details</Text>
+              <Text style={line}>
+                <strong>Name:</strong> {fullName}
+              </Text>
+              <Text style={line}>
+                <strong>Email:</strong> {email}
+              </Text>
+              <Text style={line}>
+                <strong>Phone:</strong> {phone || "Not provided"}
+              </Text>
 
-            <Hr style={divider} />
+              <Hr style={divider} />
 
-            <Text style={sectionEyebrow}>Message</Text>
-            <Text style={messageBox}>{message}</Text>
+              <Text style={sectionEyebrow}>Message</Text>
+              <Text style={messageBox}>{message}</Text>
+            </Section>
           </Section>
 
           <Section style={footer}>
@@ -83,47 +89,74 @@ const container = {
 };
 
 const hero = {
-  padding: "12px 4px 20px",
+  padding: "0 0 20px",
 };
 
 const eyebrow = {
-  margin: "0 0 8px",
+  margin: "0 0 10px",
   color: emailColors.accent,
-  fontSize: "12px",
+  fontSize: "11px",
   fontWeight: 700,
-  letterSpacing: "0.18em",
+  letterSpacing: "0.24em",
   textTransform: "uppercase" as const,
 };
 
 const titleStyles = {
   margin: "0 0 12px",
   color: emailColors.text,
-  fontSize: "34px",
-  lineHeight: "1.05",
+  fontSize: "32px",
+  lineHeight: "1.08",
 };
 
 const introStyles = {
   margin: 0,
   color: emailColors.muted,
-  fontSize: "16px",
+  fontSize: "15px",
   lineHeight: "1.7",
 };
 
 const card = {
   border: `1px solid ${emailColors.border}`,
-  borderRadius: "20px",
+  borderRadius: "0",
   backgroundColor: emailColors.card,
-  padding: "28px",
-  boxShadow: "0 14px 40px rgba(31, 27, 22, 0.06)",
+  padding: "0",
+};
+
+const stack = {
+  padding: "24px",
 };
 
 const sectionEyebrow = {
   margin: "0 0 8px",
   color: emailColors.accent,
-  fontSize: "12px",
+  fontSize: "11px",
   fontWeight: 700,
-  letterSpacing: "0.18em",
+  letterSpacing: "0.22em",
   textTransform: "uppercase" as const,
+};
+
+const heroMeta = {
+  marginTop: "18px",
+  border: `1px solid ${emailColors.border}`,
+  borderRadius: "0",
+  backgroundColor: emailColors.card,
+  padding: "16px 18px",
+};
+
+const heroMetaLabel = {
+  margin: 0,
+  color: emailColors.accent,
+  fontSize: "10px",
+  fontWeight: 700,
+  letterSpacing: "0.2em",
+  textTransform: "uppercase" as const,
+};
+
+const heroMetaValue = {
+  margin: "6px 0 0",
+  color: emailColors.text,
+  fontSize: "18px",
+  fontWeight: 700,
 };
 
 const divider = {
@@ -145,8 +178,9 @@ const messageBox = {
   fontSize: "15px",
   lineHeight: "1.75",
   padding: "16px",
-  borderRadius: "14px",
+  borderRadius: "0",
   backgroundColor: emailColors.accentSoft,
+  border: `1px solid ${emailColors.border}`,
 };
 
 const footer = {
@@ -159,4 +193,3 @@ const footerText = {
   fontSize: "13px",
   lineHeight: "1.7",
 };
-

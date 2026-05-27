@@ -20,7 +20,7 @@ const navItems: AdminNavItem[] = [
   { href: "/admin/amenities", label: "Amenities", icon: "spa" },
   { href: "/admin/rooms", label: "Rooms", icon: "bed" },
   { href: "/admin/customers", label: "Customers", icon: "groups" },
-  // { href: "/admin/settings", label: "Settings", icon: "settings" },
+  { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {

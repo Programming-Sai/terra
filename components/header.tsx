@@ -76,7 +76,7 @@ export const Header = () => {
 
       <nav
         aria-label="Mobile navigation"
-        className="fixed inset-x-0 bottom-0 z-[90] border-t border-surface-container-high bg-white/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-[90] border-t border-surface-container-high bg-white/95 backdrop-blur md:hidden print:hidden"
       >
         <div className="grid grid-cols-5">
           {mobileNavLinks.map((link) => {

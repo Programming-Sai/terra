@@ -122,12 +122,14 @@ export default function RoomDetailView({
   bookingWindows = [],
   initialCheckIn = todayDateInput(),
   initialCheckOut,
+  amenityLookup = {},
   priceConversion,
 }: {
   room: Room;
   bookingWindows?: BookingWindow[];
   initialCheckIn?: string;
   initialCheckOut?: string;
+  amenityLookup?: Record<string, string>;
   priceConversion?: PriceConversion | null;
 }) {
   const searchParams = useSearchParams();
@@ -330,20 +332,42 @@ export default function RoomDetailView({
                 Amenities
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                {room.features.map((amenity) => (
+                {room.amenities.map((amenity) => (
                   <div
                     className="flex items-center gap-3 bg-white border border-surface-container p-4"
-                    key={amenity.label}
+                    key={amenity}
                   >
                     <div className="w-8 h-8 bg-primary-fixed flex items-center justify-center shrink-0 text-primary">
-                      <Icon name={amenity.icon} className="text-sm" />
+                      <Icon
+                        name={amenityLookup[amenity.toLowerCase()] ?? "check_circle"}
+                        className="text-sm"
+                      />
                     </div>
                     <span className="font-body-md text-sm text-charred-wood">
-                      {amenity.label}
+                      {amenity}
                     </span>
                   </div>
                 ))}
               </div>
+            </section>
+
+            <section>
+              <span className="font-label-caps text-xs font-bold text-laterite-red uppercase tracking-widest">
+                Features
+              </span>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {room.features.map((feature) => (
+                  <li
+                    className="flex items-start gap-3 border border-surface-container bg-white p-4"
+                    key={feature.label}
+                  >
+                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
+                    <span className="font-body-md text-sm text-charred-wood">
+                      {feature.label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </section>
 
             <section className="bg-[#f9f8f6] border border-surface-container p-6">

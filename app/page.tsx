@@ -6,11 +6,12 @@ import {
   AmenitiesSection,
   FeaturedRoomsSection,
   LocationSection,
-  TestimonialsSection,
 } from "@/components/home-sections";
+import TestimonialsSection from "@/components/testimonials-section";
 import { getAmenities } from "@/lib/amenities";
 import { getPriceConversion } from "@/lib/currency";
 import { getRooms } from "@/lib/room-data";
+import { getSiteSettings } from "@/lib/site-settings";
 import { siteContent } from "@/lib/site-content";
 
 export const dynamic = "force-dynamic";
@@ -22,44 +23,48 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const acceptLanguage = (await headers()).get("accept-language");
-  const [rooms, amenities, priceConversion] = await Promise.all([
+  const [rooms, amenities, priceConversion, siteSettings] = await Promise.all([
     getRooms(),
     getAmenities(),
     getPriceConversion(acceptLanguage),
+    getSiteSettings(),
   ]);
+  const heroSettings = siteSettings.heroSettings;
 
   return (
     <main
       className="bg-surface-bone text-charred-wood selection:bg-dry-grass relative"
       id="home"
     >
-      <section className="relative min-h-[75vh] flex flex-col items-center justify-center overflow-hidden px-6 pt-12 pb-24">
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden px-6 pt-12 pb-24">
         <div className="absolute inset-0 z-0">
           <Image
-            alt={siteContent.home.hero.imageAlt}
-            className="object-cover brightness-75"
+            alt={heroSettings.imageAlt}
+            className="object-cover object-[50%_75%] brightness-75"
             fill
             priority
             sizes="100vw"
-            src={siteContent.home.hero.imageSrc}
+            src={heroSettings.imageSrc}
           />
-          <div className="absolute inset-0 bg-[#6c2f00]/50 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-[#6c2f00]/70 mix-blend-multiply" />
         </div>
         <div className="relative z-10 text-center max-w-4xl px-4">
           <span className="inline-block bg-dry-grass/90 text-charred-wood px-4 py-1 font-label-caps text-[10px] font-bold uppercase tracking-widest mb-6 shadow-sm">
-            {siteContent.home.hero.badge}
+            {heroSettings.badge}
           </span>
           <h1 className="font-eczar text-[48px] md:text-[80px] leading-tight text-white drop-shadow-lg font-bold">
-            {siteContent.home.hero.title}
+            {heroSettings.title}
           </h1>
           <p className="font-body-lg text-white mt-6 max-w-2xl mx-auto drop-shadow-md font-medium">
-            {siteContent.home.hero.description}
+            {heroSettings.description}
           </p>
         </div>
 
-        <div className="relative z-20 mt-12 w-full max-w-6xl">
-          <AvailabilitySearch submitLabel="Check Availability" />
-        </div>
+        {heroSettings.showAvailabilityWidget ? (
+          <div className="relative z-20 mt-12 w-full max-w-6xl">
+            <AvailabilitySearch submitLabel="Check Availability" />
+          </div>
+        ) : null}
       </section>
 
       <AmenitiesSection amenities={amenities} />

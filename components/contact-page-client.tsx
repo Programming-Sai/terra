@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import Image from "next/image";
-import type { Room } from "@/lib/rooms";
 import { siteContent } from "@/lib/site-content";
 
 type ContactFormState = {
@@ -39,9 +38,12 @@ function buildGmailComposeUrl(formData: ContactFormState) {
 }
 
 export default function ContactPageClient({
-  heroRoom,
+  heroImage,
 }: {
-  heroRoom: Room | null;
+  heroImage: {
+    alt: string;
+    image: string;
+  };
 }) {
   const [formData, setFormData] = useState<ContactFormState>({
     fullName: "",
@@ -115,22 +117,17 @@ export default function ContactPageClient({
     }));
   };
 
-  const heroRoomImage = heroRoom ?? {
-    alt: siteContent.home.hero.imageAlt,
-    image: siteContent.home.hero.imageSrc,
-  };
-
   return (
     <main className="bg-surface-bone text-charred-wood">
       <section className="relative overflow-hidden py-20">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <Image
-            alt={heroRoomImage.alt}
+            alt={heroImage.alt}
             className="object-cover"
             fill
             priority
             sizes="100vw"
-            src={heroRoomImage.image}
+            src={heroImage.image}
           />
         </div>
         <div className="absolute inset-0 bg-[#6c2f00]/90 mix-blend-multiply" />

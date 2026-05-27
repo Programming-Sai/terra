@@ -137,7 +137,7 @@ export function AmenitiesSection({
               {siteContent.home.sections.amenities.description}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-              {amenities.map((amenity) => (
+              {amenities.slice(0, 4).map((amenity) => (
                 <AmenityCard amenity={amenity} key={amenity.title} />
               ))}
             </div>

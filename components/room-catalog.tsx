@@ -4,20 +4,92 @@ import { useMemo, useState } from "react";
 import Icon from "@/components/icon";
 import RoomCard from "@/components/room-card";
 import RoomImage from "@/components/room-image";
+import type { AmenityRecord } from "@/lib/amenities";
 import type { PriceConversion } from "@/lib/currency";
 import type { Room } from "@/lib/rooms";
 import { siteContent } from "@/lib/site-content";
 
 const bedTypes = ["1 King", "1 Queen", "2 Queen"] as const;
 const roomTypes = ["Suite", "Deluxe", "Premium"] as const;
-const amenityOptions = [
-  "A/C",
-  "Wi-Fi",
-  "Mini Bar",
-  "Balcony",
-  "Bathtub",
-] as const;
-const viewTypes = ["City View", "Garden View", "Pool View"] as const;
+
+function AmenityTagInput({
+  selectedAmenities,
+  amenityOptions,
+  onAmenityToggle,
+}: {
+  selectedAmenities: string[];
+  amenityOptions: readonly AmenityRecord[];
+  onAmenityToggle: (amenity: string) => void;
+}) {
+  const [search, setSearch] = useState("");
+  const normalizedSearch = search.trim().toLowerCase();
+  const availableAmenities = amenityOptions.map((amenity) => amenity.title).filter((amenity) => {
+    if (selectedAmenities.includes(amenity)) return false;
+    if (!normalizedSearch) return true;
+
+    return amenity.toLowerCase().includes(normalizedSearch);
+  });
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2 mb-3">
+        {selectedAmenities.length > 0 ? (
+          selectedAmenities.map((amenity) => (
+            <button
+              className="inline-flex items-center gap-2 rounded-full border border-[#e7ddd6] bg-[#f8f4ef] px-3 py-1.5 font-['Montserrat:Regular',sans-serif] text-[13px] text-[#4a1e00] transition-colors hover:border-[#4a1e00] hover:bg-[#fff7f0]"
+              key={amenity}
+              onClick={() => onAmenityToggle(amenity)}
+              type="button"
+            >
+              <span>{amenity}</span>
+              <span aria-hidden="true">×</span>
+            </button>
+          ))
+        ) : (
+          <span className="font-['Montserrat:Regular',sans-serif] text-[12px] text-[#7b6b61]">
+            No amenities selected yet.
+          </span>
+        )}
+      </div>
+
+      <div className="relative">
+        <Icon
+          name="search"
+          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-outline-clay"
+        />
+        <input
+          className="w-full bg-white border border-[#f0eded] px-[12px] py-[10px] pl-11 font-['Montserrat:Regular',sans-serif] text-[14px] text-[#2f2f2f]"
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search amenities to add"
+          value={search}
+        />
+      </div>
+
+      <div className="mt-3 max-h-56 overflow-auto rounded border border-[#f0eded] bg-white">
+        {availableAmenities.length > 0 ? (
+          availableAmenities.map((amenity) => (
+            <button
+              className="flex w-full items-center justify-between border-b border-[#f8f2ec] px-4 py-3 text-left font-['Montserrat:Regular',sans-serif] text-[14px] text-[#2f2f2f] transition-colors hover:bg-[#fff7f0]"
+              key={amenity}
+              onClick={() => {
+                onAmenityToggle(amenity);
+                setSearch("");
+              }}
+              type="button"
+            >
+              <span>{amenity}</span>
+              <Icon name="add" className="text-[18px] text-[#8b4513]" />
+            </button>
+          ))
+        ) : (
+          <div className="px-4 py-4 font-['Montserrat:Regular',sans-serif] text-[13px] text-[#7b6b61]">
+            No matching amenities.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function FilterPanel({
   searchTerm,
@@ -28,7 +100,7 @@ function FilterPanel({
   selectedBedType,
   selectedRoomType,
   selectedAmenities,
-  selectedViewType,
+  amenityOptions,
   onCheckInChange,
   onCheckOutChange,
   onSearchTermChange,
@@ -36,7 +108,6 @@ function FilterPanel({
   onMaxGuestsChange,
   onBedTypeChange,
   onRoomTypeChange,
-  onViewTypeChange,
   onAmenityToggle,
   onReset,
   onClose,
@@ -49,7 +120,7 @@ function FilterPanel({
   selectedBedType: string;
   selectedRoomType: string;
   selectedAmenities: string[];
-  selectedViewType: string;
+  amenityOptions: readonly AmenityRecord[];
   onCheckInChange: (value: string) => void;
   onCheckOutChange: (value: string) => void;
   onSearchTermChange?: (value: string) => void;
@@ -57,7 +128,6 @@ function FilterPanel({
   onMaxGuestsChange: (value: number) => void;
   onBedTypeChange: (value: string) => void;
   onRoomTypeChange: (value: string) => void;
-  onViewTypeChange: (value: string) => void;
   onAmenityToggle: (amenity: string) => void;
   onReset: () => void;
   onClose?: () => void;
@@ -237,57 +307,11 @@ function FilterPanel({
         <div className="flex flex-col font-['Nimbus_Sans:Bold',sans-serif] justify-center leading-[0] not-italic text-[#2f2f2f] text-[14px] mb-[12px]">
           <p className="leading-[20px]">Amenities</p>
         </div>
-        <div className="flex flex-col gap-[8px]">
-          {amenityOptions.map((amenity) => (
-            <label
-              className="flex items-center gap-[8px] cursor-pointer"
-              key={amenity}
-            >
-              <input
-                checked={selectedAmenities.includes(amenity)}
-                className="w-[16px] h-[16px]"
-                onChange={() => onAmenityToggle(amenity)}
-                type="checkbox"
-              />
-              <span className="font-['Montserrat:Regular',sans-serif] text-[14px] text-[#54433b]">
-                {amenity}
-              </span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <div className="flex flex-col font-['Nimbus_Sans:Bold',sans-serif] justify-center leading-[0] not-italic text-[#2f2f2f] text-[14px] mb-[12px]">
-          <p className="leading-[20px]">View Type</p>
-        </div>
-        <div className="flex flex-col gap-[8px]">
-          {viewTypes.map((view) => (
-            <label
-              className="flex items-center gap-[8px] cursor-pointer"
-              key={view}
-            >
-              <input
-                checked={selectedViewType === view}
-                className="w-[16px] h-[16px]"
-                name="viewType"
-                onChange={(event) => onViewTypeChange(event.target.value)}
-                type="radio"
-                value={view}
-              />
-              <span className="font-['Montserrat:Regular',sans-serif] text-[14px] text-[#54433b]">
-                {view}
-              </span>
-            </label>
-          ))}
-          <button
-            className="text-left font-['Montserrat:Regular',sans-serif] text-[12px] text-[#8b4513] underline"
-            onClick={() => onViewTypeChange("")}
-            type="button"
-          >
-            Clear
-          </button>
-        </div>
+        <AmenityTagInput
+          amenityOptions={amenityOptions}
+          onAmenityToggle={onAmenityToggle}
+          selectedAmenities={selectedAmenities}
+        />
       </div>
 
       <button
@@ -372,6 +396,7 @@ function Pagination({
 
 export default function RoomCatalog({
   initialFilters,
+  amenityOptions,
   rooms,
   priceConversion,
 }: {
@@ -382,8 +407,8 @@ export default function RoomCatalog({
     searchTerm?: string;
     selectedBedType?: string;
     selectedRoomType?: string;
-    selectedViewType?: string;
   };
+  amenityOptions: readonly AmenityRecord[];
   rooms: readonly Room[];
   priceConversion?: PriceConversion | null;
 }) {
@@ -402,9 +427,6 @@ export default function RoomCatalog({
   const [maxGuests, setMaxGuests] = useState<number>(
     initialFilters?.maxGuests ?? 1,
   );
-  const [selectedViewType, setSelectedViewType] = useState<string>(
-    initialFilters?.selectedViewType ?? "",
-  );
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -421,7 +443,6 @@ export default function RoomCatalog({
           room.description,
           room.roomType,
           room.bedType,
-          room.viewType,
           ...room.amenities,
         ]
           .join(" ")
@@ -436,7 +457,6 @@ export default function RoomCatalog({
       if (selectedBedType && room.bedType !== selectedBedType) return false;
       if (selectedRoomType && room.roomType !== selectedRoomType) return false;
       if (room.maxGuests < maxGuests) return false;
-      if (selectedViewType && room.viewType !== selectedViewType) return false;
       if (
         selectedAmenities.length > 0 &&
         !selectedAmenities.every((amenity) => room.amenities.includes(amenity))
@@ -451,7 +471,6 @@ export default function RoomCatalog({
     selectedBedType,
     selectedRoomType,
     maxGuests,
-    selectedViewType,
     selectedAmenities,
     searchTerm,
   ]);
@@ -479,7 +498,6 @@ export default function RoomCatalog({
     setSelectedBedType("");
     setSelectedRoomType("");
     setMaxGuests(1);
-    setSelectedViewType("");
     setSelectedAmenities([]);
     setCurrentPage(1);
   };
@@ -519,22 +537,17 @@ export default function RoomCatalog({
     setCurrentPage(1);
   };
 
-  const updateViewType = (value: string) => {
-    setSelectedViewType(value);
-    setCurrentPage(1);
-  };
-
   return (
     <>
       <section className="relative py-[72px] md:py-[80px] overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <RoomImage
-            alt="Hero background"
+            alt={siteContent.rooms.heroImageAlt}
             className="object-cover"
             fill
             priority
             sizes="100vw"
-            src={rooms[0]?.image ?? siteContent.home.hero.imageSrc}
+            src={siteContent.rooms.heroImageSrc}
           />
         </div>
         <div className="absolute inset-0 bg-[#6c2f00]/90 mix-blend-multiply" />
@@ -595,12 +608,11 @@ export default function RoomCatalog({
               onPriceRangeChange={updatePriceRange}
               onReset={resetFilters}
               onRoomTypeChange={updateRoomType}
-              onViewTypeChange={updateViewType}
               priceRange={priceRange}
+              amenityOptions={amenityOptions}
               selectedAmenities={selectedAmenities}
               selectedBedType={selectedBedType}
               selectedRoomType={selectedRoomType}
-              selectedViewType={selectedViewType}
             />
           </aside>
 
@@ -679,12 +691,11 @@ export default function RoomCatalog({
                 onPriceRangeChange={updatePriceRange}
                 onReset={resetFilters}
                 onRoomTypeChange={updateRoomType}
-                onViewTypeChange={updateViewType}
                 priceRange={priceRange}
+                amenityOptions={amenityOptions}
                 selectedAmenities={selectedAmenities}
                 selectedBedType={selectedBedType}
                 selectedRoomType={selectedRoomType}
-                selectedViewType={selectedViewType}
               />
             </div>
           </div>

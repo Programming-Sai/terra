@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/icon";
 import type { AdminPaymentRecord, AdminPaymentStat } from "@/lib/admin-data";
@@ -533,21 +533,17 @@ export function AdminPaymentsView({
     window.URL.revokeObjectURL(url);
   };
 
-  const filteredPayments = useMemo(
-    () =>
-      payments.filter((payment) => {
-        const matchesFilter =
-          selectedFilter === "all" || payment.status.toLowerCase() === selectedFilter;
-        const matchesSearch =
-          payment.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.transactionRef.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.bookingId.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPayments = payments.filter((payment) => {
+    const matchesFilter =
+      selectedFilter === "all" || payment.status.toLowerCase() === selectedFilter;
+    const matchesSearch =
+      payment.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.transactionRef.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.bookingId.toLowerCase().includes(searchTerm.toLowerCase());
 
-        return matchesFilter && matchesSearch;
-      }),
-    [payments, searchTerm, selectedFilter],
-  );
+    return matchesFilter && matchesSearch;
+  });
 
   const pageCount = Math.max(Math.ceil(filteredPayments.length / pageSize), 1);
   const displayPage = Math.min(page, pageCount);

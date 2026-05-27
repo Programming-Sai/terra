@@ -317,3 +317,48 @@ on conflict (slug) do update set
   featured = excluded.featured,
   sort_order = excluded.sort_order,
   is_active = excluded.is_active;
+
+insert into site_settings (
+  id,
+  general_settings,
+  notification_settings,
+  payment_settings,
+  hero_settings
+)
+values (
+  1,
+  '{
+    "hotelName": "Terra Lodge",
+    "email": "info@terra-lodge.com",
+    "phone": "+233 24 123 4567",
+    "address": "X9 Coffee Highway, Adenta, Accra, Ghana",
+    "currency": "GHS",
+    "timezone": "GMT"
+  }'::jsonb,
+  '{
+    "emailNotifications": true,
+    "smsNotifications": false,
+    "bookingAlerts": true,
+    "paymentAlerts": true,
+    "cancelationAlerts": true
+  }'::jsonb,
+  '{
+    "mobileMoney": true,
+    "cardPayments": true,
+    "bankTransfer": true,
+    "cashPayments": true
+  }'::jsonb,
+  '{
+    "badge": "Welcome",
+    "title": "Experience Authentic Comfort.",
+    "description": "Quality accommodation with traditional Ghanaian hospitality. Your serene home away from home.",
+    "imageSrc": "/spots/spot-5-entrance.jpeg",
+    "imageAlt": "Terra Lodge entrance with warm evening light",
+    "showAvailabilityWidget": true
+  }'::jsonb
+)
+on conflict (id) do update set
+  general_settings = excluded.general_settings,
+  notification_settings = excluded.notification_settings,
+  payment_settings = excluded.payment_settings,
+  hero_settings = excluded.hero_settings;

@@ -53,28 +53,32 @@ export function detectPreferredCurrency(acceptLanguage?: string | null) {
 }
 
 const getGhsRate = cache(async (currencyCode: string) => {
-  const response = await fetch(
-    `https://api.frankfurter.dev/v1/latest?base=GHS&symbols=${encodeURIComponent(currencyCode)}`,
-    {
-      headers: {
-        Accept: "application/json",
+  try {
+    const response = await fetch(
+      `https://api.frankfurter.dev/v1/latest?base=GHS&symbols=${encodeURIComponent(currencyCode)}`,
+      {
+        headers: {
+          Accept: "application/json",
+        },
+        next: {
+          revalidate: 60 * 60 * 12,
+        },
       },
-      next: {
-        revalidate: 60 * 60 * 12,
-      },
-    },
-  );
+    );
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = (await response.json()) as {
+      rates?: Record<string, number>;
+    };
+
+    const rate = payload.rates?.[currencyCode];
+    return typeof rate === "number" ? rate : null;
+  } catch {
     return null;
   }
-
-  const payload = (await response.json()) as {
-    rates?: Record<string, number>;
-  };
-
-  const rate = payload.rates?.[currencyCode];
-  return typeof rate === "number" ? rate : null;
 });
 
 export async function getPriceConversion(acceptLanguage?: string | null) {

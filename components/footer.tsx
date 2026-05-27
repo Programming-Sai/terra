@@ -47,7 +47,7 @@ function SocialMark({ name }: { name: string }) {
 
 export const Footer = () => {
   return (
-    <footer className="w-full relative bg-charred-wood text-white">
+    <footer className="w-full relative bg-charred-wood text-white print:hidden">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-6 md:px-section-padding py-16 w-full max-w-7xl mx-auto">
         <div className="md:col-span-1">
           <div className="font-headline-md text-dry-grass font-bold mb-4">

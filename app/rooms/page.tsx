@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import RoomCatalog from "@/components/room-catalog";
+import { getAmenities } from "@/lib/amenities";
 import { getPriceConversion } from "@/lib/currency";
 import { getRooms } from "@/lib/room-data";
 import { siteContent } from "@/lib/site-content";
@@ -24,7 +25,7 @@ export default async function RoomsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const rooms = await getRooms();
+  const [rooms, amenities] = await Promise.all([getRooms(), getAmenities()]);
   const query = await searchParams;
   const priceConversion = await getPriceConversion((await headers()).get("accept-language"));
   const guestsValue = parseCount(query.guests, 1);
@@ -34,9 +35,6 @@ export default async function RoomsPage({
   const selectedRoomType = Array.isArray(query.roomType)
     ? query.roomType[0]
     : query.roomType;
-  const selectedViewType = Array.isArray(query.viewType)
-    ? query.viewType[0]
-    : query.viewType;
   const search = Array.isArray(query.search) ? query.search[0] : query.search;
   const checkIn = Array.isArray(query.checkIn) ? query.checkIn[0] : query.checkIn;
   const checkOut = Array.isArray(query.checkOut) ? query.checkOut[0] : query.checkOut;
@@ -44,6 +42,7 @@ export default async function RoomsPage({
   return (
     <main className="bg-surface-bone text-charred-wood">
       <RoomCatalog
+        amenityOptions={amenities}
         rooms={rooms}
         priceConversion={priceConversion}
         initialFilters={{
@@ -53,7 +52,6 @@ export default async function RoomsPage({
           searchTerm: search,
           selectedBedType,
           selectedRoomType,
-          selectedViewType,
         }}
       />
     </main>

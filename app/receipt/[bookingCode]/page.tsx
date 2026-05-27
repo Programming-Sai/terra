@@ -1,10 +1,5 @@
-import { notFound, redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 import { PaymentReceiptView } from "@/components/admin/payment-receipt-view";
-import {
-  ADMIN_COOKIE_NAME,
-  verifyAdminSessionToken,
-} from "@/lib/admin-auth";
 import { getAdminPaymentReceiptData } from "@/lib/admin-data";
 
 export const dynamic = "force-dynamic";
@@ -16,13 +11,6 @@ export default async function PaymentReceiptPage({
   params: Promise<{ bookingCode: string }>;
   searchParams?: Promise<{ download?: string }>;
 }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-
-  if (!(await verifyAdminSessionToken(token))) {
-    redirect("/admin/login");
-  }
-
   const { bookingCode } = await params;
   const receipt = await getAdminPaymentReceiptData(bookingCode);
 

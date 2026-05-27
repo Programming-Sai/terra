@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     `select id
      from bookings
      where room_id = $1
-       and booking_status in ('pending', 'confirmed')
+       and booking_status = 'confirmed'
        and check_in_date < $3::date
        and check_out_date > $2::date
      limit 1`,

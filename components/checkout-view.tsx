@@ -157,20 +157,14 @@ function ModalShell({
 function SuccessModal({
   onClose,
   reference,
-  roomId,
+  bookingCode,
   whatsappHref,
 }: {
   onClose: () => void;
   reference: string;
-  roomId: string | number;
+  bookingCode: string;
   whatsappHref: string;
 }) {
-  const bookingParams = new URLSearchParams({
-    booking: "success",
-    bookingRoomId: String(roomId),
-    bookingRef: reference,
-  });
-
   return (
     <ModalShell
       icon={<Icon name="check" className="text-3xl" />}
@@ -179,7 +173,7 @@ function SuccessModal({
       primaryAction={
         <Link
           className="flex-1 bg-primary px-6 py-4 cursor-pointer hover:bg-laterite-red transition-colors text-center"
-          href={`/room/${roomId}?${bookingParams.toString()}`}
+          href={`/receipt/${bookingCode}`}
         >
           <span className="font-label-caps text-sm font-bold text-white uppercase">
             View My Booking
@@ -300,6 +294,7 @@ export default function CheckoutView({
   const [isLoading, setIsLoading] = useState(false);
   const [pendingBookingId, setPendingBookingId] = useState<string>("");
   const [completedReference, setCompletedReference] = useState<string>("");
+  const [completedBookingCode, setCompletedBookingCode] = useState<string>("");
 
   const activeModal = isModalType(modalFromUrl) ? modalFromUrl : null;
   const booking = useMemo<BookingDetails>(
@@ -468,6 +463,7 @@ export default function CheckoutView({
         (await initializeResponse.json()) as InitializeResponse;
       setPendingBookingId(initializeData.bookingId);
       setCompletedReference(initializeData.reference);
+      setCompletedBookingCode(initializeData.bookingCode);
 
       const paystack = new PaystackPop();
 
@@ -819,9 +815,9 @@ export default function CheckoutView({
 
       {activeModal === "success" ? (
         <SuccessModal
+          bookingCode={completedBookingCode}
           onClose={() => setModalInUrl(null)}
           reference={bookingReference}
-          roomId={room.id}
           whatsappHref={whatsappHref}
         />
       ) : null}

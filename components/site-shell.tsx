@@ -15,7 +15,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground pb-24 md:pb-0">
+    <div className="flex min-h-screen flex-col bg-background text-foreground pb-24 md:pb-0 print:pb-0">
       <Header />
       {children}
       <Footer />

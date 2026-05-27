@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import ContactPageClient from "@/components/contact-page-client";
-import { getRooms } from "@/lib/room-data";
 import { siteContent } from "@/lib/site-content";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +11,12 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const rooms = await getRooms();
-
-  return <ContactPageClient heroRoom={rooms[0] ?? null} />;
+  return (
+    <ContactPageClient
+      heroImage={{
+        alt: siteContent.contact.heroImageAlt,
+        image: siteContent.contact.heroImageSrc,
+      }}
+    />
+  );
 }

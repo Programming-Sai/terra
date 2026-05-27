@@ -18,7 +18,7 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/icon";
 import type { AdminRoomRecord } from "@/lib/admin-data";
@@ -122,7 +122,7 @@ const emptyRoomForm = (): RoomFormState => ({
   size: "",
   amenities: [],
   features: [],
-  cancellation_policy: "",
+  cancellation_policy: "Free cancellation up to 48 hours before check-in",
   is_active: true,
   availability_status: "available",
   featured: false,
@@ -557,29 +557,32 @@ function TagSelectInput({
   helpText?: string;
   onChange: (nextValue: string[]) => void;
 }) {
-  const [selectedValue, setSelectedValue] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const tags = value;
-  const availableOptions = options.filter(
-    (option) =>
-      !tags.some((item) => item.toLowerCase() === option.toLowerCase()),
-  );
-  const visibleSelectedValue = availableOptions.some(
-    (option) => option.toLowerCase() === selectedValue.toLowerCase(),
-  )
-    ? selectedValue
-    : "";
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const availableOptions = options.filter((option) => {
+    if (tags.some((item) => item.toLowerCase() === option.toLowerCase())) {
+      return false;
+    }
 
-  function addSelectedOption() {
-    if (!selectedValue) return;
+    if (!normalizedSearch) {
+      return true;
+    }
 
-    const normalized = selectedValue.trim();
+    return option.toLowerCase().includes(normalizedSearch);
+  });
+
+  function addSelectedOption(option: string) {
+    const normalized = option.trim();
     if (!normalized) return;
 
     if (!tags.some((item) => item.toLowerCase() === normalized.toLowerCase())) {
       onChange([...tags, normalized]);
     }
 
-    setSelectedValue("");
+    setSearchTerm("");
+    setIsOpen(false);
   }
 
   return (
@@ -588,34 +591,6 @@ function TagSelectInput({
         {label}
       </label>
       <div className="border border-surface-container bg-white p-4">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div>
-            <label className="mb-2 block font-label-caps text-[10px] font-bold uppercase tracking-widest text-outline-clay">
-              Select Amenity
-            </label>
-            <select
-              className="w-full border border-surface-container bg-surface-bone px-4 py-3 font-body-md text-[14px] text-charred-wood outline-none transition-colors focus:border-primary"
-              onChange={(event) => setSelectedValue(event.target.value)}
-              value={visibleSelectedValue}
-            >
-              <option value="">Choose an amenity</option>
-              {availableOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            className="inline-flex cursor-pointer items-center justify-center border border-primary bg-primary px-5 py-3 font-label-caps text-[11px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-laterite-red disabled:cursor-not-allowed disabled:opacity-70"
-            disabled={!visibleSelectedValue}
-            onClick={addSelectedOption}
-            type="button"
-          >
-            Add Amenity
-          </button>
-        </div>
-
         <div className="mt-4 flex flex-wrap gap-2">
           {tags.map((item) => (
             <button
@@ -636,15 +611,56 @@ function TagSelectInput({
           ))}
         </div>
 
-        {availableOptions.length > 0 ? (
-          <p className="mt-3 font-body-md text-[12px] text-outline-clay">
-            Choose from the approved amenities list. Click a tag to remove it.
-          </p>
-        ) : (
-          <p className="mt-3 font-body-md text-[12px] text-outline-clay">
-            All approved amenities have already been added.
-          </p>
-        )}
+        <div className="mt-4 relative">
+          <label className="mb-2 block font-label-caps text-[10px] font-bold uppercase tracking-widest text-outline-clay">
+            Search Amenity
+          </label>
+          <input
+            className="w-full border border-surface-container bg-surface-bone px-4 py-3 font-body-md text-[14px] text-charred-wood outline-none transition-colors focus:border-primary"
+            onBlur={() => {
+              window.setTimeout(() => setIsOpen(false), 150);
+            }}
+            onChange={(event) => {
+              setSearchTerm(event.target.value);
+              setIsOpen(true);
+            }}
+            onFocus={() => setIsOpen(true)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && availableOptions[0]) {
+                event.preventDefault();
+                addSelectedOption(availableOptions[0]);
+              }
+            }}
+            placeholder="Search approved amenities"
+            value={searchTerm}
+          />
+
+          {isOpen ? (
+            <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-56 overflow-auto border border-surface-container bg-white shadow-lg">
+              {availableOptions.length > 0 ? (
+                availableOptions.map((option) => (
+                  <button
+                    className="flex w-full items-center justify-between border-b border-surface-container px-4 py-3 text-left font-body-md text-[14px] text-charred-wood transition-colors hover:bg-surface-bone"
+                    key={option}
+                    onClick={() => addSelectedOption(option)}
+                    type="button"
+                  >
+                    <span>{option}</span>
+                    <Icon name="add" className="text-[18px] text-primary" />
+                  </button>
+                ))
+              ) : (
+                <div className="px-4 py-4 font-body-md text-[13px] text-outline-clay">
+                  No matching amenities available.
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
+
+        <p className="mt-3 font-body-md text-[12px] text-outline-clay">
+          Search, click, or press Enter to add approved amenities. Click a tag to remove it.
+        </p>
       </div>
       <p className="mt-2 font-body-md text-[12px] text-outline-clay">
         {helpText ?? "Select an amenity from the list and click Add."}
@@ -723,6 +739,7 @@ function RoomEditorModal({
   error,
   invalidFields,
   amenityOptions,
+  featuredAmenityOptions,
   imageUrlDraft,
   isUploadingImages,
   sensors,
@@ -743,6 +760,7 @@ function RoomEditorModal({
   error: string | null;
   invalidFields: Array<keyof RoomFormState>;
   amenityOptions: string[];
+  featuredAmenityOptions: string[];
   imageUrlDraft: string;
   isUploadingImages: boolean;
   sensors: ReturnType<typeof useSensors>;
@@ -759,13 +777,25 @@ function RoomEditorModal({
 }) {
   const title = mode === "create" ? "Add New Room" : "Edit Room";
   const mainImage = form.images[0];
+  const [useFeaturedAmenityDefaults, setUseFeaturedAmenityDefaults] = useState(false);
   const hasError = (field: keyof RoomFormState) => invalidFields.includes(field);
   const controlClass = (field: keyof RoomFormState) =>
     `w-full border bg-white px-4 py-3 font-body-md text-[14px] text-charred-wood outline-none transition-colors ${
       hasError(field)
         ? "border-red-400 focus:border-red-500"
-        : "border-surface-container focus:border-primary"
+      : "border-surface-container focus:border-primary"
     }`;
+
+  useEffect(() => {
+    if (mode !== "create" || !useFeaturedAmenityDefaults || featuredAmenityOptions.length === 0) {
+      return;
+    }
+
+    const merged = Array.from(new Set([...featuredAmenityOptions, ...form.amenities]));
+    if (merged.length !== form.amenities.length) {
+      onChange("amenities", merged);
+    }
+  }, [featuredAmenityOptions, form.amenities, mode, onChange, useFeaturedAmenityDefaults]);
 
   return (
     <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/50 p-4">
@@ -1059,6 +1089,32 @@ function RoomEditorModal({
               value={form.amenities}
             />
 
+            {mode === "create" && featuredAmenityOptions.length > 0 ? (
+              <label className="flex items-start gap-3 rounded-sm border border-surface-container bg-surface-bone p-4 lg:col-span-2">
+                <input
+                  checked={useFeaturedAmenityDefaults}
+                  className="mt-1 h-4 w-4 accent-primary"
+                  onChange={(event) => {
+                    const checked = event.target.checked;
+                    setUseFeaturedAmenityDefaults(checked);
+                    if (checked) {
+                      const merged = Array.from(
+                        new Set([...featuredAmenityOptions, ...form.amenities]),
+                      );
+                      onChange("amenities", merged);
+                    }
+                  }}
+                  type="checkbox"
+                />
+                <span className="font-body-md text-[14px] text-charred-wood">
+                  Preload featured amenities
+                  <span className="block text-[12px] text-outline-clay">
+                    Automatically adds all featured amenities to the amenities list for a new room.
+                  </span>
+                </span>
+              </label>
+            ) : null}
+
             <TagInput
               helpText="Use these for room highlights or special selling points."
               label="Features"
@@ -1071,12 +1127,12 @@ function RoomEditorModal({
               <label className="mb-2 block font-label-caps text-[12px] font-bold uppercase tracking-widest text-outline-clay">
                 Cancellation Policy
               </label>
-              <textarea
+                <textarea
                 className="min-h-[96px] w-full border border-surface-container bg-white px-4 py-3 font-body-md text-[14px] text-charred-wood outline-none transition-colors focus:border-primary"
                 onChange={(event) =>
                   onChange("cancellation_policy", event.target.value)
                 }
-                placeholder="Free cancellation up to 24 hours before check-in."
+                placeholder="Free cancellation up to 48 hours before check-in."
                 value={form.cancellation_policy}
               />
             </div>
@@ -1284,6 +1340,22 @@ export function AdminRoomsView({
   const amenityOptions = useMemo(() => {
     const options = amenities
       .filter((amenity) => amenity.is_active)
+      .map((amenity) => amenity.title.trim())
+      .filter(Boolean);
+
+    const unique = new Map<string, string>();
+    for (const option of options) {
+      const key = option.toLowerCase();
+      if (!unique.has(key)) {
+        unique.set(key, option);
+      }
+    }
+
+    return Array.from(unique.values()).sort((a, b) => a.localeCompare(b));
+  }, [amenities]);
+  const featuredAmenityOptions = useMemo(() => {
+    const options = amenities
+      .filter((amenity) => amenity.is_active && amenity.featured)
       .map((amenity) => amenity.title.trim())
       .filter(Boolean);
 
@@ -1865,6 +1937,7 @@ export function AdminRoomsView({
         <RoomEditorModal
           error={editorError}
           amenityOptions={amenityOptions}
+          featuredAmenityOptions={featuredAmenityOptions}
           invalidFields={invalidFields}
           form={form}
           isLoading={isLoadingRoom}

@@ -50,7 +50,7 @@ export const FAB = () => {
 
   return (
     <>
-      <div className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[100] flex flex-col items-end gap-3 group">
+      <div className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[100] flex flex-col items-end gap-3 group print:hidden">
         <div className="flex flex-col items-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
           <a
             className="bg-white text-charred-wood border border-surface-container flex items-center gap-2 px-4 py-3 rounded-full shadow-lg hover:bg-surface-container transition-colors"
@@ -94,7 +94,7 @@ export const FAB = () => {
         </button>
       </div>
 
-      <div className="fixed bottom-24 right-4 z-[100] flex flex-col items-end gap-3 md:hidden">
+      <div className="fixed bottom-24 right-4 z-[100] flex flex-col items-end gap-3 md:hidden print:hidden">
         {isMobileActionsOpen ? (
           <>
             <button

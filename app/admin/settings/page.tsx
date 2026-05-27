@@ -1,8 +1,8 @@
-// import { AdminSettingsView } from "@/components/admin/admin-settings-view";
+import { AdminSettingsView } from "@/components/admin/admin-settings-view";
+import { getSiteSettings } from "@/lib/site-settings";
 
-import NotFound from "@/app/not-found";
+export default async function AdminSettingsPage() {
+  const initialSettings = await getSiteSettings();
 
-export default function AdminSettingsPage() {
-  return <NotFound />;
-  // return <AdminSettingsView />;
+  return <AdminSettingsView initialSettings={initialSettings} />;
 }

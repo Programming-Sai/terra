@@ -220,7 +220,7 @@ async function fetchBookingsWithRooms() {
   await query(
     `update bookings
      set booking_status = 'expired'
-     where booking_status in ('pending', 'confirmed')
+     where booking_status = 'confirmed'
        and check_out_date < current_date`,
   );
 

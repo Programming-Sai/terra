@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { query as dbQuery } from "@/lib/db";
 import { getPriceConversion } from "@/lib/currency";
+import { getAmenities } from "@/lib/amenities";
 import { getRoomByIdentifier } from "@/lib/room-data";
 import RoomDetailView from "@/components/room-detail-view";
 import { siteContent } from "@/lib/site-content";
@@ -38,7 +39,7 @@ export default async function RoomDetailPage({
   params: Promise<{ roomId: string }>;
 }) {
   const { roomId } = await params;
-  const room = await getRoomByIdentifier(roomId);
+  const [room, amenities] = await Promise.all([getRoomByIdentifier(roomId), getAmenities()]);
 
   if (!room) {
     notFound();
@@ -48,7 +49,7 @@ export default async function RoomDetailPage({
     `select check_in_date, check_out_date
      from bookings
      where room_id = $1
-       and booking_status in ('pending', 'confirmed')
+       and booking_status = 'confirmed'
      order by check_in_date asc`,
     [room.id],
   );
@@ -66,6 +67,9 @@ export default async function RoomDetailPage({
       bookingWindows={bookingWindows}
       initialCheckIn={initialCheckIn}
       initialCheckOut={initialCheckOut}
+      amenityLookup={Object.fromEntries(
+        amenities.map((amenity) => [amenity.title.toLowerCase(), amenity.icon]),
+      )}
       priceConversion={priceConversion}
       room={room}
     />
